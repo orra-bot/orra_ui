@@ -1,0 +1,31 @@
+name: orra_desktop_shell
+description: orra_ui 的桌面窗口外壳：无标题栏窗口、侧栏 + 内容面板、窗口按钮、窗口状态、菜单与快捷键。
+version: 0.1.0
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.13.0
+  flutter: ">=3.47.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  orra_ui:
+    path: ../orra_ui
+  path_provider: 2.1.6
+  screen_retriever: 0.2.2
+  window_manager: 0.5.2
+
+dev_dependencies:
+  flutter_lints: 6.0.0
+  flutter_test:
+    sdk: flutter
+  orra_guardrails:
+    path: ../orra_guardrails
+
+flutter:
+  plugin:
+    platforms:
+      macos:
+        pluginClass: OrraDesktopShellPlugin

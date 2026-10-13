@@ -1,0 +1,16 @@
+name: orra_guardrails
+description: orra_ui 的守护规则：设计变量三层约束与禁用原生控件检查（在单元测试中运行）。
+version: 0.1.0
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.13.0
+
+dependencies:
+  analyzer: 13.3.0
+  path: 1.9.1
+
+dev_dependencies:
+  lints: 6.1.0
+  test: 1.31.1

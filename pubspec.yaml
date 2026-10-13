@@ -1,0 +1,11 @@
+name: orra_workspace
+publish_to: none
+
+environment:
+  sdk: ^3.13.0
+
+workspace:
+  - packages/orra_ui
+  - packages/orra_desktop_shell
+  - packages/orra_guardrails
+  - example

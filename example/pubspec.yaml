@@ -1,0 +1,28 @@
+name: orra_gallery
+description: orra_ui 组件展示应用（视觉验收用）。
+publish_to: none
+version: 0.1.0
+resolution: workspace
+
+environment:
+  sdk: ^3.13.0
+  flutter: ">=3.47.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  lucide_icons_flutter: 3.1.25
+  orra_desktop_shell:
+    path: ../packages/orra_desktop_shell
+  orra_ui:
+    path: ../packages/orra_ui
+
+dev_dependencies:
+  flutter_lints: 6.0.0
+  flutter_test:
+    sdk: flutter
+  orra_guardrails:
+    path: ../packages/orra_guardrails
+
+flutter:
+  uses-material-design: false
