@@ -9,11 +9,13 @@
 
 Native-feeling SaaS apps for macOS, Windows, and Linux, with the same app running in the browser. Ships with a Linear-inspired default theme, and every token can be overridden.
 
+[![CI](https://github.com/orra-bot/orra_ui/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/orra-bot/orra_ui/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-6d78d5.svg)](LICENSE)
 [![Flutter](https://img.shields.io/badge/Flutter-%E2%89%A53.47-02569B?logo=flutter&logoColor=white)](https://flutter.dev)
 [![Dart](https://img.shields.io/badge/Dart-%E2%89%A53.13-0175C2?logo=dart&logoColor=white)](https://dart.dev)
 ![Platforms](https://img.shields.io/badge/platforms-macOS%20%7C%20Windows%20%7C%20Linux%20%7C%20Web-lightgrey)
 ![No Material](https://img.shields.io/badge/material-not%20required-1b1b1b)
+[![PRs welcome](https://img.shields.io/badge/PRs-welcome-6d78d5.svg)](CONTRIBUTING.md)
 
 **English** · [简体中文](README.zh-CN.md)
 
@@ -403,13 +405,15 @@ cd packages/orra_desktop_shell && flutter test --platform chrome test/web_test.d
 
 ## Contributing
 
-Issues and pull requests are welcome. A few house rules keep the system coherent:
+Issues and pull requests are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) before you start. In short:
 
-1. **Compose before you add.** New components should be discussed in an issue first. Page layouts belong in apps, not in `orra_ui`.
+1. **Compose before you add.** New components start as a [component proposal](https://github.com/orra-bot/orra_ui/issues/new?template=component_proposal.yml). Page layouts belong in apps, not in `orra_ui`.
 2. **No literals outside primitives.** Add a semantic token when the purpose is shared, or a component token when it isn't. Dark-mode values go in the semantic layer only.
 3. **Translucent fills on chrome.** Hover, selected, and pressed states on the sidebar and title bar use overlay colors, never solid fills.
 4. **No focus rings.** This is a deliberate product decision. Focused inputs show it by changing their border color instead.
-5. **Prove it with tests.** Assert geometry and state. Run `flutter analyze` and `flutter test` in every package before opening a PR.
+5. **Prove it with tests.** Assert geometry and state. CI runs formatting, analysis, and every test suite on macOS, Windows, Linux, and Chrome.
+
+This project follows the [Code of Conduct](CODE_OF_CONDUCT.md). Report security issues privately as described in [SECURITY.md](SECURITY.md).
 
 ## Acknowledgements
 

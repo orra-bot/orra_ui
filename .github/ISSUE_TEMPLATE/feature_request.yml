@@ -1,0 +1,49 @@
+name: Feature request
+description: Suggest an improvement to an existing component, token, or the window shell.
+labels: ["enhancement", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        English or 中文 are both fine. Proposing a brand-new component? Use the **Component proposal** template instead.
+
+  - type: dropdown
+    id: package
+    attributes:
+      label: Package
+      multiple: true
+      options:
+        - orra_ui
+        - orra_desktop_shell
+        - orra_guardrails
+        - example (gallery)
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What are you trying to do, and what gets in the way today?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: The API or behavior you have in mind. Code sketches are welcome.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Can this be done today by composing existing components or overriding tokens?
+
+  - type: textarea
+    id: references
+    attributes:
+      label: References
+      description: Screenshots or links showing the behavior in Linear, Cursor, macOS, etc.

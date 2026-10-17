@@ -1,0 +1,79 @@
+name: Bug report
+description: Something renders, behaves, or builds incorrectly.
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug. English or 中文 are both fine.
+        Please search [existing issues](https://github.com/orra-bot/orra_ui/issues) first.
+
+  - type: dropdown
+    id: package
+    attributes:
+      label: Package
+      multiple: true
+      options:
+        - orra_ui
+        - orra_desktop_shell
+        - orra_guardrails
+        - example (gallery)
+        - Not sure
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: platforms
+    attributes:
+      label: Platforms
+      description: Where does the bug happen?
+      options:
+        - label: macOS
+        - label: Windows
+        - label: Linux
+        - label: Web (JavaScript)
+        - label: Web (Wasm)
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: A clear description of the bug, and what you expected instead.
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      description: A minimal code sample or the gallery page and steps that show the bug.
+      placeholder: |
+        1. Open the gallery and go to Menus
+        2. Right-click the first row
+        3. ...
+      render: markdown
+    validations:
+      required: true
+
+  - type: textarea
+    id: media
+    attributes:
+      label: Screenshots or recordings
+      description: Especially useful for visual bugs. Light and dark mode if relevant.
+
+  - type: input
+    id: orra-version
+    attributes:
+      label: orra_ui version or commit
+      placeholder: "0.1.0 / main @ 55da376"
+    validations:
+      required: true
+
+  - type: textarea
+    id: doctor
+    attributes:
+      label: flutter doctor -v
+      description: Paste the output of `flutter doctor -v`.
+      render: text
+    validations:
+      required: true

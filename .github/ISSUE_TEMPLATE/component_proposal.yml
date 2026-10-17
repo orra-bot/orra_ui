@@ -1,0 +1,60 @@
+name: Component proposal
+description: Propose a new component for orra_ui. Please open this before sending a PR.
+labels: ["component-proposal", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        orra_ui grows deliberately: **compose before you add**. Page layouts belong in apps, not in the library.
+        Check the [Roadmap](https://github.com/orra-bot/orra_ui#roadmap) first; the component may already be planned.
+        English or 中文 are both fine.
+
+  - type: input
+    id: name
+    attributes:
+      label: Component name
+      placeholder: RaSegmentedControl
+    validations:
+      required: true
+
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use case
+      description: Where would apps use it, and why can't it be composed from existing components?
+    validations:
+      required: true
+
+  - type: textarea
+    id: api
+    attributes:
+      label: Proposed API
+      description: Constructor parameters, variants, sizes, and states.
+      render: dart
+    validations:
+      required: true
+
+  - type: textarea
+    id: tokens
+    attributes:
+      label: Tokens
+      description: Which semantic tokens does it use? Does it need a new component theme (`Ra…ThemeData`)?
+
+  - type: textarea
+    id: interaction
+    attributes:
+      label: Interaction and accessibility
+      description: Keyboard behavior, hover / pressed / disabled states, semantics, reduced motion.
+
+  - type: textarea
+    id: references
+    attributes:
+      label: Visual references
+      description: Screenshots of the reference design (Linear, Cursor, macOS…) in light and dark mode.
+
+  - type: checkboxes
+    id: contribute
+    attributes:
+      label: Contribution
+      options:
+        - label: I'd like to implement this myself once the design is agreed.

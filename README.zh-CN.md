@@ -6,11 +6,13 @@
 
 用来做像原生应用一样的 SaaS 应用，支持 macOS、Windows、Linux，同一个应用也能在浏览器中运行。默认主题取法 Linear，每个设计变量都可以覆盖。
 
+[![CI](https://github.com/orra-bot/orra_ui/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/orra-bot/orra_ui/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-6d78d5.svg)](LICENSE)
 [![Flutter](https://img.shields.io/badge/Flutter-%E2%89%A53.47-02569B?logo=flutter&logoColor=white)](https://flutter.dev)
 [![Dart](https://img.shields.io/badge/Dart-%E2%89%A53.13-0175C2?logo=dart&logoColor=white)](https://dart.dev)
 ![Platforms](https://img.shields.io/badge/platforms-macOS%20%7C%20Windows%20%7C%20Linux%20%7C%20Web-lightgrey)
 ![No Material](https://img.shields.io/badge/material-not%20required-1b1b1b)
+[![PRs welcome](https://img.shields.io/badge/PRs-welcome-6d78d5.svg)](CONTRIBUTING.md)
 
 [English](README.md) · **简体中文**
 
@@ -412,13 +414,15 @@ cd packages/orra_desktop_shell && flutter test --platform chrome test/web_test.d
 
 ## 参与贡献
 
-欢迎提交 Issue 和 Pull Request。为了让设计系统保持一致，请遵守以下约定：
+欢迎提交 Issue 和 Pull Request，开始前请先阅读 [CONTRIBUTING.md](CONTRIBUTING.md)。要点如下：
 
-1. **先组合，再新增**：新组件请先开 Issue 讨论。页面版式放在应用侧，不进入 `orra_ui`。
+1. **先组合，再新增**：新组件请先提交[组件提案](https://github.com/orra-bot/orra_ui/issues/new?template=component_proposal.yml)。页面版式放在应用侧，不进入 `orra_ui`。
 2. **基础层以外不写字面量**：多处共用的用途加语义变量，只属于某个组件的加组件变量；深色值只写在语义层。
 3. **窗口底上只用半透明叠加色**：侧栏和标题栏的悬停、选中、按下都用叠加色，不用实色。
 4. **不显示焦点环**：这是刻意的产品决定。输入框聚焦以边框变色表示。
-5. **用测试证明**：断言几何与状态。提交 PR 前，在每个包里运行 `flutter analyze` 和 `flutter test`。
+5. **用测试证明**：断言几何与状态。CI 会在 macOS、Windows、Linux 和 Chrome 上检查格式、静态分析并运行全部测试。
+
+本项目遵守[行为准则](CODE_OF_CONDUCT.md)。安全问题请按 [SECURITY.md](SECURITY.md) 私下报告。
 
 ## 致谢
 
