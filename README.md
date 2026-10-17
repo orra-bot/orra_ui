@@ -4,6 +4,9 @@
 
 **A configurable design system for Flutter desktop and web apps.**
 
+<img width="2560" height="1714" alt="telegram-cloud-photo-size-5-6231194516920668802-w" src="https://github.com/user-attachments/assets/bfd116fe-7869-4814-9e06-b67a5c0a2caa" />
+
+
 Native-feeling SaaS apps for macOS, Windows, and Linux, with the same app running in the browser. Ships with a Linear-inspired default theme, and every token can be overridden.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-6d78d5.svg)](LICENSE)
