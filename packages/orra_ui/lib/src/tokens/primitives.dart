@@ -122,7 +122,9 @@ abstract final class RaSizes {
   static const double s20 = 20;
   static const double s22 = 22;
   static const double s24 = 24;
+  static const double s26 = 26;
   static const double s28 = 28;
+  static const double s30 = 30;
   static const double s32 = 32;
   static const double s36 = 36;
   static const double s40 = 40;
@@ -191,9 +193,10 @@ abstract final class RaFontScale {
 /// 时长（毫秒）与缓动。
 abstract final class RaDurations {
   static const Duration ms0 = Duration.zero;
-  static const Duration ms100 = Duration(milliseconds: 100);
+  static const Duration ms50 = Duration(milliseconds: 50);
+  static const Duration ms75 = Duration(milliseconds: 75);
+  static const Duration ms125 = Duration(milliseconds: 125);
   static const Duration ms150 = Duration(milliseconds: 150);
-  static const Duration ms250 = Duration(milliseconds: 250);
   static const Duration ms300 = Duration(milliseconds: 300);
   static const Duration ms600 = Duration(milliseconds: 600);
   static const Duration ms800 = Duration(milliseconds: 800);
@@ -209,7 +212,6 @@ abstract final class RaCurves {
 abstract final class RaNumbers {
   static const double scale96 = 0.96;
   static const double scale98 = 0.98;
-  static const double fraction2 = 0.02;
   static const double opacity60 = 0.6;
   static const double opacity70 = 0.7;
   static const double stroke1_5 = 1.5;

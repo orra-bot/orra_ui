@@ -288,7 +288,7 @@ class RaButtonThemeData {
         RaButtonVariant.secondary: RaButtonStyle(
           backgroundColor: raStateColor(
             c.surface,
-            hovered: c.hover,
+            hovered: c.surfaceHover,
             disabled: RaPalette.transparent,
           ),
           foregroundColor: raStateColor(c.ink, disabled: c.disabledInk),
@@ -464,6 +464,8 @@ class RaFieldThemeData {
     required this.searchIconInset,
     required this.searchPaddingLeft,
     required this.searchIconColor,
+    required this.trailingPaddingRight,
+    required this.trailingGap,
   });
 
   factory RaFieldThemeData.fallback(RaTokens t) {
@@ -497,6 +499,8 @@ class RaFieldThemeData {
       searchIconInset: t.spacing.md,
       searchPaddingLeft: RaSizes.s32,
       searchIconColor: c.ink3,
+      trailingPaddingRight: t.spacing.xs2,
+      trailingGap: t.spacing.xs,
     );
   }
 
@@ -528,6 +532,10 @@ class RaFieldThemeData {
   final double searchIconInset;
   final double searchPaddingLeft;
   final Color searchIconColor;
+
+  /// 输入框内带尾部控件（RaTextField.trailing）时的右内边距与间距。
+  final double trailingPaddingRight;
+  final double trailingGap;
 }
 
 // ---------------------------------------------------------------------------
@@ -640,6 +648,8 @@ class RaMenuThemeData {
     required this.triggerPill,
     required this.triggerChip,
     required this.triggerRow,
+    required this.triggerPillPlainPadding,
+    required this.triggerChipPlainPadding,
     required this.avatarSize,
     required this.avatarBackground,
     required this.avatarForeground,
@@ -682,14 +692,14 @@ class RaMenuThemeData {
       enterOffset: RaSizes.s4,
       scale: t.motion.scalePop,
       duration: t.motion.fast,
-      submenuHoverDelay: t.motion.base,
+      submenuHoverDelay: RaDurations.ms150,
       triggerPill: RaButtonStyle(
         height: RaSizes.s36,
         padding: EdgeInsets.only(left: t.spacing.xs2, right: t.spacing.md),
         gap: t.spacing.sm,
         radius: t.radii.pill,
         textStyle: ty.body,
-        backgroundColor: raStateColor(c.surface, hovered: c.hover, selected: c.hover),
+        backgroundColor: raStateColor(c.surface, hovered: c.surfaceHover, selected: c.surfaceHover),
         foregroundColor: raStateColor(c.ink, disabled: c.disabledInk),
         borderColor: WidgetStatePropertyAll<Color?>(c.border),
         shadows: WidgetStatePropertyAll<List<BoxShadow>?>(t.shadows.raised),
@@ -726,6 +736,8 @@ class RaMenuThemeData {
         ),
         foregroundColor: WidgetStatePropertyAll<Color?>(c.ink),
       ),
+      triggerPillPlainPadding: EdgeInsets.only(left: t.spacing.lg, right: t.spacing.md),
+      triggerChipPlainPadding: EdgeInsets.only(left: t.spacing.sm, right: t.spacing.xs),
       avatarSize: RaSizes.s28,
       avatarBackground: c.accentSoft,
       avatarForeground: c.accentInk,
@@ -791,6 +803,10 @@ class RaMenuThemeData {
 
   /// 触发按钮：侧栏整行（如 Workspace 选择器）。
   final RaButtonStyle triggerRow;
+
+  /// 胶囊 / chip 触发器没有前置图标时的内边距（有图标时左侧收紧到 4，贴合头像）。
+  final EdgeInsets triggerPillPlainPadding;
+  final EdgeInsets triggerChipPlainPadding;
   final double avatarSize;
   final Color avatarBackground;
   final Color avatarForeground;
@@ -818,7 +834,7 @@ class RaDialogThemeData {
     required this.descriptionStyle,
     required this.footerGap,
     required this.footerTopGap,
-    required this.enterOffsetFraction,
+    required this.scale,
     required this.duration,
   });
 
@@ -837,7 +853,7 @@ class RaDialogThemeData {
     descriptionStyle: t.typography.body.copyWith(color: t.colors.ink2),
     footerGap: t.spacing.sm,
     footerTopGap: t.spacing.sm,
-    enterOffsetFraction: RaNumbers.fraction2,
+    scale: t.motion.scalePop,
     duration: t.motion.base,
   );
 
@@ -859,8 +875,8 @@ class RaDialogThemeData {
   final double footerGap;
   final double footerTopGap;
 
-  /// 进场时向下偏移自身高度的比例（2%）。
-  final double enterOffsetFraction;
+  /// 打开 / 关闭时的起止缩放（0.96 ↔ 1，配合淡入淡出）。
+  final double scale;
   final Duration duration;
 }
 
@@ -999,6 +1015,7 @@ class RaSidebarThemeData {
     required this.dotOnline,
     required this.dotOffline,
     required this.emptyStyle,
+    required this.hoverExitDuration,
   });
 
   factory RaSidebarThemeData.fallback(RaTokens t) {
@@ -1039,6 +1056,7 @@ class RaSidebarThemeData {
       dotOnline: c.success,
       dotOffline: c.ink3,
       emptyStyle: t.typography.caption.copyWith(color: c.inkWindow3),
+      hoverExitDuration: t.motion.instant,
     );
   }
 
@@ -1085,6 +1103,9 @@ class RaSidebarThemeData {
   final Color dotOnline;
   final Color dotOffline;
   final TextStyle emptyStyle;
+
+  /// 悬停移开时底色消失的时长（侧栏不做淡出，直接消失）。
+  final Duration hoverExitDuration;
 }
 
 // ---------------------------------------------------------------------------
@@ -1121,6 +1142,966 @@ class RaScrollbarThemeData {
 }
 
 // ---------------------------------------------------------------------------
+// Tabs
+// ---------------------------------------------------------------------------
+
+/// 页面内标签（横排或竖排）：32px 行、圆角 8；默认次要色，悬停 / 当前项变为正文色，底色只用半透明叠加色。
+@immutable
+class RaTabsThemeData {
+  const RaTabsThemeData({
+    required this.height,
+    required this.paddingX,
+    required this.gap,
+    required this.radius,
+    required this.listGap,
+    required this.iconSize,
+    required this.textStyle,
+    required this.color,
+    required this.activeColor,
+    required this.disabledColor,
+    required this.hoverColor,
+    required this.selectedColor,
+    required this.pressedColor,
+  });
+
+  factory RaTabsThemeData.fallback(RaTokens t) => RaTabsThemeData(
+    height: RaSizes.s32,
+    paddingX: t.spacing.lg,
+    gap: t.spacing.md,
+    radius: t.radii.md,
+    listGap: t.spacing.xs3,
+    iconSize: t.sizing.iconSm,
+    textStyle: t.typography.bodyMedium,
+    color: t.colors.ink2,
+    activeColor: t.colors.ink,
+    disabledColor: t.colors.disabledInk,
+    hoverColor: t.colors.fillTranslucentHover,
+    selectedColor: t.colors.fillTranslucentSelected,
+    pressedColor: t.colors.fillTranslucentActive,
+  );
+
+  final double height;
+  final double paddingX;
+
+  /// 图标与文字的间距。
+  final double gap;
+  final double radius;
+
+  /// 标签之间的间距。
+  final double listGap;
+  final double iconSize;
+  final TextStyle textStyle;
+  final Color color;
+  final Color activeColor;
+  final Color disabledColor;
+  final Color hoverColor;
+  final Color selectedColor;
+  final Color pressedColor;
+}
+
+// ---------------------------------------------------------------------------
+// SegmentedControl
+// ---------------------------------------------------------------------------
+
+/// 分段切换：凹陷底槽（内边距 2、圆角 8），选中段为白底 + 淡阴影的滑块（圆角 6、高 26），切换时滑到新位置。
+@immutable
+class RaSegmentedControlThemeData {
+  const RaSegmentedControlThemeData({
+    required this.padding,
+    required this.radius,
+    required this.backgroundColor,
+    required this.itemHeight,
+    required this.itemPaddingX,
+    required this.itemRadius,
+    required this.textStyle,
+    required this.selectedTextStyle,
+    required this.color,
+    required this.hoverColor,
+    required this.selectedColor,
+    required this.disabledColor,
+    required this.selectedBackgroundColor,
+    required this.selectedShadows,
+    required this.thumbDuration,
+    required this.thumbCurve,
+  });
+
+  factory RaSegmentedControlThemeData.fallback(RaTokens t) => RaSegmentedControlThemeData(
+    padding: t.spacing.xs3,
+    radius: t.radii.md,
+    backgroundColor: t.colors.sunken,
+    itemHeight: RaSizes.s26,
+    itemPaddingX: t.spacing.xl,
+    itemRadius: t.radii.sm,
+    textStyle: t.typography.body,
+    selectedTextStyle: t.typography.bodyMedium,
+    color: t.colors.ink2,
+    hoverColor: t.colors.ink,
+    selectedColor: t.colors.ink,
+    disabledColor: t.colors.disabledInk,
+    selectedBackgroundColor: t.colors.surface,
+    selectedShadows: t.shadows.raised,
+    thumbDuration: t.motion.slow,
+    thumbCurve: t.motion.emphasized,
+  );
+
+  final double padding;
+  final double radius;
+  final Color backgroundColor;
+  final double itemHeight;
+  final double itemPaddingX;
+  final double itemRadius;
+  final TextStyle textStyle;
+  final TextStyle selectedTextStyle;
+  final Color color;
+  final Color hoverColor;
+  final Color selectedColor;
+  final Color disabledColor;
+  final Color selectedBackgroundColor;
+  final List<BoxShadow> selectedShadows;
+
+  /// 选中滑块移到新位置的时长与缓动。
+  final Duration thumbDuration;
+  final Curve thumbCurve;
+}
+
+// ---------------------------------------------------------------------------
+// Tag
+// ---------------------------------------------------------------------------
+
+/// 标签语气：neutral 中性 · success 成功 · attention 需要处理 · accent 强调 · danger 危险 ·
+/// outline 虚线描边（未开放 / 占位）· muted 弱化。
+enum RaTagTone { neutral, success, attention, accent, danger, outline, muted }
+
+/// 一种语气的配色。
+@immutable
+class RaTagStyle {
+  const RaTagStyle({
+    required this.foregroundColor,
+    this.backgroundColor,
+    this.borderColor,
+    this.dashed = false,
+  });
+
+  final Color foregroundColor;
+  final Color? backgroundColor;
+  final Color? borderColor;
+
+  /// 描边为虚线。
+  final bool dashed;
+}
+
+/// 状态标签（20 高胶囊、12px / 500、可带 6px 圆点）与计数徽标。
+@immutable
+class RaTagThemeData {
+  const RaTagThemeData({
+    required this.height,
+    required this.paddingX,
+    required this.gap,
+    required this.radius,
+    required this.dotSize,
+    required this.textStyle,
+    required this.tones,
+    required this.dashLength,
+    required this.dashGap,
+    required this.countSize,
+    required this.countPaddingX,
+    required this.countBackgroundColor,
+    required this.countTextStyle,
+  });
+
+  factory RaTagThemeData.fallback(RaTokens t) {
+    final RaColors c = t.colors;
+    return RaTagThemeData(
+      height: RaSizes.s20,
+      paddingX: t.spacing.sm,
+      gap: t.spacing.xs,
+      radius: t.radii.pill,
+      dotSize: RaSizes.s6,
+      textStyle: t.typography.captionMedium,
+      tones: <RaTagTone, RaTagStyle>{
+        RaTagTone.neutral: RaTagStyle(backgroundColor: c.sunken, foregroundColor: c.ink2),
+        RaTagTone.success: RaTagStyle(backgroundColor: c.successSoft, foregroundColor: c.success),
+        RaTagTone.attention: RaTagStyle(
+          backgroundColor: c.attentionSoft,
+          foregroundColor: c.attentionInk,
+        ),
+        RaTagTone.accent: RaTagStyle(backgroundColor: c.accentSoft, foregroundColor: c.accentInk),
+        RaTagTone.danger: RaTagStyle(backgroundColor: c.dangerWash, foregroundColor: c.dangerInk),
+        RaTagTone.outline: RaTagStyle(
+          borderColor: c.borderStrong,
+          foregroundColor: c.ink3,
+          dashed: true,
+        ),
+        RaTagTone.muted: RaTagStyle(
+          backgroundColor: c.ground,
+          borderColor: c.border,
+          foregroundColor: c.ink3,
+        ),
+      },
+      dashLength: RaSizes.s3,
+      dashGap: RaSizes.s2,
+      countSize: RaSizes.s20,
+      countPaddingX: t.spacing.xs,
+      countBackgroundColor: c.attention,
+      countTextStyle: t.typography.style(
+        size: t.typography.sizeXs,
+        lineHeight: t.typography.lineHeightXs,
+        weight: t.typography.weightBold,
+        color: c.surface,
+        tabularFigures: true,
+      ),
+    );
+  }
+
+  final double height;
+  final double paddingX;
+  final double gap;
+  final double radius;
+  final double dotSize;
+  final TextStyle textStyle;
+  final Map<RaTagTone, RaTagStyle> tones;
+
+  /// 虚线描边的线段与间隔长度。
+  final double dashLength;
+  final double dashGap;
+  final double countSize;
+  final double countPaddingX;
+  final Color countBackgroundColor;
+  final TextStyle countTextStyle;
+
+  RaTagStyle styleOf(RaTagTone tone) => tones[tone] ?? tones[RaTagTone.neutral]!;
+}
+
+// ---------------------------------------------------------------------------
+// SideCard / PropertyRow
+// ---------------------------------------------------------------------------
+
+/// 右侧栏属性卡片（Linear）：白底、0.5px 描边、圆角 10；标题 28 高可折叠；属性行 28 高、标签列 90。
+@immutable
+class RaSideCardThemeData {
+  const RaSideCardThemeData({
+    required this.backgroundColor,
+    required this.borderColor,
+    required this.shadows,
+    required this.radius,
+    required this.padding,
+    required this.headHeight,
+    required this.headGap,
+    required this.titleStyle,
+    required this.titleColor,
+    required this.titleHoverColor,
+    required this.caretSize,
+    required this.caretColor,
+    required this.actionSize,
+    required this.bodyPaddingY,
+    required this.rowGap,
+    required this.rowHeight,
+    required this.rowColumnGap,
+    required this.labelWidth,
+    required this.labelStyle,
+    required this.valueStyle,
+    required this.valueGap,
+  });
+
+  factory RaSideCardThemeData.fallback(RaTokens t) => RaSideCardThemeData(
+    backgroundColor: t.colors.surface,
+    borderColor: t.colors.borderPopover,
+    shadows: t.shadows.raised,
+    radius: t.radii.lg,
+    padding: EdgeInsets.symmetric(horizontal: t.spacing.lg, vertical: t.spacing.xs),
+    headHeight: RaSizes.s28,
+    headGap: t.spacing.xs,
+    titleStyle: t.typography.bodyMedium,
+    titleColor: t.colors.ink2,
+    titleHoverColor: t.colors.ink,
+    caretSize: t.sizing.icon2xs,
+    caretColor: t.colors.ink3,
+    actionSize: RaSizes.s28,
+    bodyPaddingY: t.spacing.xs,
+    rowGap: t.spacing.sm,
+    rowHeight: RaSizes.s28,
+    rowColumnGap: t.spacing.sm,
+    labelWidth: 90,
+    labelStyle: t.typography.caption.copyWith(color: t.colors.ink2),
+    valueStyle: t.typography.caption.copyWith(color: t.colors.ink),
+    valueGap: t.spacing.xs,
+  );
+
+  final Color backgroundColor;
+  final Color borderColor;
+  final List<BoxShadow> shadows;
+  final double radius;
+  final EdgeInsets padding;
+  final double headHeight;
+
+  /// 标题与小三角的间距。
+  final double headGap;
+  final TextStyle titleStyle;
+  final Color titleColor;
+  final Color titleHoverColor;
+  final double caretSize;
+  final Color caretColor;
+  final double actionSize;
+
+  /// 内容区上下留白（与卡片内边距相加，标题与首行、末行与卡片底各 12）。
+  final double bodyPaddingY;
+  final double rowGap;
+  final double rowHeight;
+  final double rowColumnGap;
+  final double labelWidth;
+  final TextStyle labelStyle;
+  final TextStyle valueStyle;
+
+  /// 值内多个元素（图标 + 文字、标签……）的间距。
+  final double valueGap;
+}
+
+// ---------------------------------------------------------------------------
+// State blocks（加载 / 空 / 错误）
+// ---------------------------------------------------------------------------
+
+@immutable
+class RaStateBlockThemeData {
+  const RaStateBlockThemeData({
+    required this.radius,
+    required this.padding,
+    required this.gap,
+    required this.titleStyle,
+    required this.errorTitleColor,
+    required this.textStyle,
+    required this.actionTopGap,
+    required this.loadingBackgroundColor,
+    required this.loadingBorderColor,
+    required this.emptyBorderColor,
+    required this.errorBackgroundColor,
+    required this.errorBorderColor,
+    required this.dashLength,
+    required this.dashGap,
+    required this.skeletonHeight,
+    required this.skeletonRadius,
+    required this.skeletonColor,
+    required this.skeletonWidths,
+  });
+
+  factory RaStateBlockThemeData.fallback(RaTokens t) {
+    final RaColors c = t.colors;
+    final RaTypography ty = t.typography;
+    return RaStateBlockThemeData(
+      radius: t.radii.xl,
+      padding: t.spacing.xl2,
+      gap: t.spacing.sm,
+      titleStyle: ty.style(
+        size: ty.sizeMd,
+        lineHeight: ty.lineHeightMd,
+        weight: ty.weightSemibold,
+        color: c.ink,
+      ),
+      errorTitleColor: c.dangerInk,
+      textStyle: ty.body.copyWith(color: c.ink2),
+      actionTopGap: t.spacing.xs3,
+      loadingBackgroundColor: c.surface,
+      loadingBorderColor: c.border,
+      emptyBorderColor: c.borderStrong,
+      errorBackgroundColor: c.dangerWash,
+      errorBorderColor: c.dangerBorder,
+      dashLength: RaSizes.s4,
+      dashGap: RaSizes.s3,
+      skeletonHeight: RaSizes.s12,
+      skeletonRadius: t.radii.sm,
+      skeletonColor: c.sunken,
+      skeletonWidths: const <double>[0.6, 0.85, 0.4],
+    );
+  }
+
+  final double radius;
+  final double padding;
+  final double gap;
+  final TextStyle titleStyle;
+  final Color errorTitleColor;
+  final TextStyle textStyle;
+  final double actionTopGap;
+  final Color loadingBackgroundColor;
+  final Color loadingBorderColor;
+
+  /// 空状态为虚线描边。
+  final Color emptyBorderColor;
+  final Color errorBackgroundColor;
+  final Color errorBorderColor;
+  final double dashLength;
+  final double dashGap;
+  final double skeletonHeight;
+  final double skeletonRadius;
+  final Color skeletonColor;
+
+  /// 加载骨架各行的宽度（占可用宽度的比例）。
+  final List<double> skeletonWidths;
+}
+
+// ---------------------------------------------------------------------------
+// Drawer
+// ---------------------------------------------------------------------------
+
+/// 抽屉：从窗口右侧滑出，宽 min(360, 窗口宽 × 92%)。
+@immutable
+class RaDrawerThemeData {
+  const RaDrawerThemeData({
+    required this.width,
+    required this.maxWidthFraction,
+    required this.padding,
+    required this.gap,
+    required this.backgroundColor,
+    required this.shadows,
+    required this.barrierColor,
+    required this.titleStyle,
+    required this.duration,
+    required this.curve,
+  });
+
+  factory RaDrawerThemeData.fallback(RaTokens t) => RaDrawerThemeData(
+    width: 360,
+    maxWidthFraction: 0.92,
+    padding: t.spacing.xl2,
+    gap: t.spacing.xl,
+    backgroundColor: t.colors.surface,
+    shadows: t.shadows.dialog,
+    barrierColor: t.colors.overlay,
+    titleStyle: t.typography.title.copyWith(color: t.colors.ink),
+    duration: t.motion.slow,
+    curve: t.motion.emphasized,
+  );
+
+  final double width;
+  final double maxWidthFraction;
+  final double padding;
+
+  /// 标题行与内容的间距。
+  final double gap;
+  final Color backgroundColor;
+  final List<BoxShadow> shadows;
+  final Color barrierColor;
+  final TextStyle titleStyle;
+  final Duration duration;
+  final Curve curve;
+}
+
+// ---------------------------------------------------------------------------
+// Checkbox / Radio / Switch
+// ---------------------------------------------------------------------------
+
+/// 复选框、单选框与开关：14px 方框（圆角 4）/ 圆框，选中为强调色实心；开关 28×16、滑块 12。
+@immutable
+class RaControlThemeData {
+  const RaControlThemeData({
+    required this.boxSize,
+    required this.boxRadius,
+    required this.indicatorSize,
+    required this.radioDotSize,
+    required this.backgroundColor,
+    required this.borderColor,
+    required this.hoverBorderColor,
+    required this.checkedColor,
+    required this.checkedHoverColor,
+    required this.onCheckedColor,
+    required this.shadows,
+    required this.switchWidth,
+    required this.switchHeight,
+    required this.switchThumbSize,
+    required this.switchTrackColor,
+    required this.switchTrackHoverColor,
+    required this.switchThumbColor,
+    required this.switchThumbShadows,
+    required this.labelGap,
+    required this.labelStyle,
+    required this.descriptionStyle,
+    required this.disabledOpacity,
+    required this.groupGap,
+    required this.groupIndent,
+    required this.duration,
+  });
+
+  factory RaControlThemeData.fallback(RaTokens t) {
+    final RaColors c = t.colors;
+    return RaControlThemeData(
+      boxSize: t.sizing.iconSm,
+      boxRadius: RaSizes.s4,
+      indicatorSize: t.sizing.icon2xs,
+      radioDotSize: RaSizes.s6,
+      backgroundColor: c.surface,
+      borderColor: c.borderStrong,
+      hoverBorderColor: c.ink3,
+      checkedColor: c.accent,
+      checkedHoverColor: c.accentHover,
+      onCheckedColor: c.onAccent,
+      shadows: t.shadows.raised,
+      switchWidth: RaSizes.s28,
+      switchHeight: RaSizes.s16,
+      switchThumbSize: RaSizes.s12,
+      switchTrackColor: c.borderStrong,
+      switchTrackHoverColor: c.ink3,
+      switchThumbColor: c.surface,
+      switchThumbShadows: t.shadows.raised,
+      labelGap: t.spacing.sm,
+      labelStyle: t.typography.body.copyWith(color: c.ink),
+      descriptionStyle: t.typography.caption.copyWith(color: c.ink2),
+      disabledOpacity: t.opacity.disabled,
+      groupGap: t.spacing.md,
+      groupIndent: RaSizes.s22,
+      duration: t.motion.fast,
+    );
+  }
+
+  final double boxSize;
+  final double boxRadius;
+
+  /// 对勾 / 横线图标尺寸。
+  final double indicatorSize;
+  final double radioDotSize;
+  final Color backgroundColor;
+  final Color borderColor;
+  final Color hoverBorderColor;
+  final Color checkedColor;
+  final Color checkedHoverColor;
+  final Color onCheckedColor;
+  final List<BoxShadow> shadows;
+  final double switchWidth;
+  final double switchHeight;
+  final double switchThumbSize;
+
+  /// 关闭时的轨道色。
+  final Color switchTrackColor;
+  final Color switchTrackHoverColor;
+  final Color switchThumbColor;
+  final List<BoxShadow> switchThumbShadows;
+  final double labelGap;
+  final TextStyle labelStyle;
+  final TextStyle descriptionStyle;
+  final double disabledOpacity;
+
+  /// 单选组各项的间距。
+  final double groupGap;
+
+  /// 复选框组中子项的缩进（方框 14 + 间距 8，子项方框与父项文字对齐）。
+  final double groupIndent;
+
+  /// 勾选 / 开合的过渡。
+  final Duration duration;
+}
+
+// ---------------------------------------------------------------------------
+// Select
+// ---------------------------------------------------------------------------
+
+/// 选择框（设置页）：30 高、圆角 8、13 / 450，右侧小箭头；弹出与菜单同外观。
+@immutable
+class RaSelectThemeData {
+  const RaSelectThemeData({
+    required this.trigger,
+    required this.maxWidth,
+    required this.caretSize,
+    required this.caretColor,
+    required this.placeholderColor,
+  });
+
+  factory RaSelectThemeData.fallback(RaTokens t) {
+    final RaColors c = t.colors;
+    return RaSelectThemeData(
+      trigger: RaButtonStyle(
+        layout: RaButtonLayout.inline,
+        height: RaSizes.s30,
+        padding: EdgeInsets.only(left: t.spacing.md, right: t.spacing.sm),
+        gap: t.spacing.sm,
+        radius: t.radii.md,
+        textStyle: t.typography.body,
+        backgroundColor: raStateColor(c.surface, hovered: c.surfaceHover, selected: c.surfaceHover),
+        foregroundColor: raStateColor(c.ink, disabled: c.disabledInk),
+        borderColor: WidgetStatePropertyAll<Color?>(c.border),
+        shadows: WidgetStatePropertyAll<List<BoxShadow>?>(t.shadows.raised),
+      ),
+      maxWidth: 280,
+      caretSize: t.sizing.iconXs,
+      caretColor: c.ink3,
+      placeholderColor: c.ink3,
+    );
+  }
+
+  final RaButtonStyle trigger;
+  final double maxWidth;
+  final double caretSize;
+  final Color caretColor;
+  final Color placeholderColor;
+}
+
+// ---------------------------------------------------------------------------
+// Popover / PreviewCard
+// ---------------------------------------------------------------------------
+
+/// 弹出面板（Base UI Popover）：与菜单同一层次的白底浮层（圆角 12、0.5px 描边、弹层阴影），
+/// 内边距 12，可带标题与说明；悬停预览卡（PreviewCard）共用外观。
+@immutable
+class RaPopoverThemeData {
+  const RaPopoverThemeData({
+    required this.backgroundColor,
+    required this.borderColor,
+    required this.shadows,
+    required this.radius,
+    required this.padding,
+    required this.maxWidth,
+    required this.gap,
+    required this.titleStyle,
+    required this.descriptionStyle,
+    required this.sideOffset,
+    required this.screenMargin,
+    required this.enterOffset,
+    required this.scale,
+    required this.duration,
+    required this.previewWidth,
+    required this.previewOpenDelay,
+    required this.previewCloseDelay,
+  });
+
+  factory RaPopoverThemeData.fallback(RaTokens t) => RaPopoverThemeData(
+    backgroundColor: t.colors.surface,
+    borderColor: t.colors.borderPopover,
+    shadows: t.shadows.popup,
+    radius: t.radii.xl,
+    padding: EdgeInsets.all(t.spacing.lg),
+    maxWidth: 360,
+    gap: t.spacing.xs2,
+    titleStyle: t.typography.bodyMedium.copyWith(color: t.colors.ink),
+    descriptionStyle: t.typography.body.copyWith(color: t.colors.ink2),
+    sideOffset: t.spacing.xs,
+    screenMargin: t.spacing.sm,
+    enterOffset: RaSizes.s4,
+    scale: t.motion.scalePop,
+    duration: t.motion.fast,
+    previewWidth: 320,
+    previewOpenDelay: RaDurations.ms600,
+    previewCloseDelay: RaDurations.ms300,
+  );
+
+  final Color backgroundColor;
+  final Color borderColor;
+  final List<BoxShadow> shadows;
+  final double radius;
+  final EdgeInsets padding;
+  final double maxWidth;
+
+  /// 标题、说明、内容之间的间距。
+  final double gap;
+  final TextStyle titleStyle;
+  final TextStyle descriptionStyle;
+  final double sideOffset;
+  final double screenMargin;
+  final double enterOffset;
+  final double scale;
+  final Duration duration;
+
+  /// 预览卡宽度。
+  final double previewWidth;
+
+  /// 悬停多久后打开预览卡。
+  final Duration previewOpenDelay;
+
+  /// 指针离开（触发元素与卡片）多久后关闭预览卡。
+  final Duration previewCloseDelay;
+}
+
+// ---------------------------------------------------------------------------
+// Combobox / Autocomplete
+// ---------------------------------------------------------------------------
+
+/// 可搜索的选择框 / 自动补全：输入框 + 下方选项列表（外观与菜单相同，宽度与输入框一致）。
+@immutable
+class RaComboboxThemeData {
+  const RaComboboxThemeData({
+    required this.maxListHeight,
+    required this.emptyStyle,
+    required this.emptyPadding,
+    required this.caretSize,
+    required this.caretColor,
+  });
+
+  factory RaComboboxThemeData.fallback(RaTokens t) => RaComboboxThemeData(
+    maxListHeight: 300,
+    emptyStyle: t.typography.body.copyWith(color: t.colors.ink3),
+    emptyPadding: EdgeInsets.symmetric(horizontal: t.spacing.sm, vertical: t.spacing.xs),
+    caretSize: t.sizing.iconXs,
+    caretColor: t.colors.ink3,
+  );
+
+  /// 列表最高（超出滚动）。
+  final double maxListHeight;
+
+  /// 没有匹配项时的提示。
+  final TextStyle emptyStyle;
+  final EdgeInsets emptyPadding;
+  final double caretSize;
+  final Color caretColor;
+}
+
+// ---------------------------------------------------------------------------
+// Slider
+// ---------------------------------------------------------------------------
+
+/// 滑杆：4px 轨道（凹陷色）+ 强调色进度；14px 白色滑块带描边与淡阴影。命中区高 20。
+@immutable
+class RaSliderThemeData {
+  const RaSliderThemeData({
+    required this.height,
+    required this.trackHeight,
+    required this.trackColor,
+    required this.fillColor,
+    required this.thumbSize,
+    required this.thumbColor,
+    required this.thumbBorderColor,
+    required this.thumbHoverBorderColor,
+    required this.thumbShadows,
+    required this.disabledOpacity,
+  });
+
+  factory RaSliderThemeData.fallback(RaTokens t) => RaSliderThemeData(
+    height: RaSizes.s20,
+    trackHeight: RaSizes.s4,
+    trackColor: t.colors.sunken,
+    fillColor: t.colors.accent,
+    thumbSize: t.sizing.iconSm,
+    thumbColor: t.colors.surface,
+    thumbBorderColor: t.colors.borderStrong,
+    thumbHoverBorderColor: t.colors.ink3,
+    thumbShadows: t.shadows.raised,
+    disabledOpacity: t.opacity.disabled,
+  );
+
+  /// 整体（命中区）高度。
+  final double height;
+  final double trackHeight;
+  final Color trackColor;
+  final Color fillColor;
+  final double thumbSize;
+  final Color thumbColor;
+  final Color thumbBorderColor;
+  final Color thumbHoverBorderColor;
+  final List<BoxShadow> thumbShadows;
+  final double disabledOpacity;
+}
+
+// ---------------------------------------------------------------------------
+// Progress / Meter
+// ---------------------------------------------------------------------------
+
+/// 计量条的语气（Meter）：normal 强调色 · attention 接近上限 · danger 超限。
+enum RaMeterTone { normal, attention, danger }
+
+/// 进度条与计量条：4px 胶囊轨道；上方可带标签与数值（12px 次要色、等宽数字）。
+@immutable
+class RaProgressThemeData {
+  const RaProgressThemeData({
+    required this.trackHeight,
+    required this.radius,
+    required this.trackColor,
+    required this.fillColor,
+    required this.meterColors,
+    required this.labelStyle,
+    required this.valueStyle,
+    required this.labelGap,
+    required this.indeterminateFraction,
+    required this.indeterminatePeriod,
+    required this.duration,
+  });
+
+  factory RaProgressThemeData.fallback(RaTokens t) {
+    final RaColors c = t.colors;
+    return RaProgressThemeData(
+      trackHeight: RaSizes.s4,
+      radius: t.radii.pill,
+      trackColor: c.sunken,
+      fillColor: c.accent,
+      meterColors: <RaMeterTone, Color>{
+        RaMeterTone.normal: c.accent,
+        RaMeterTone.attention: c.attention,
+        RaMeterTone.danger: c.danger,
+      },
+      labelStyle: t.typography.caption.copyWith(color: c.ink2),
+      valueStyle: t.typography.caption.copyWith(color: c.ink2, fontFeatures: _tabular),
+      labelGap: t.spacing.xs,
+      indeterminateFraction: 0.4,
+      indeterminatePeriod: t.motion.spin,
+      duration: t.motion.slow,
+    );
+  }
+
+  static const List<FontFeature> _tabular = <FontFeature>[FontFeature.tabularFigures()];
+
+  final double trackHeight;
+  final double radius;
+  final Color trackColor;
+  final Color fillColor;
+  final Map<RaMeterTone, Color> meterColors;
+  final TextStyle labelStyle;
+  final TextStyle valueStyle;
+
+  /// 标签行与轨道的间距。
+  final double labelGap;
+
+  /// 不确定进度时滑动段占轨道宽度的比例。
+  final double indeterminateFraction;
+
+  /// 不确定进度滑动一次的时长。
+  final Duration indeterminatePeriod;
+
+  /// 数值变化时进度的过渡。
+  final Duration duration;
+}
+
+// ---------------------------------------------------------------------------
+// NumberField
+// ---------------------------------------------------------------------------
+
+/// 数字输入框：输入框右侧内嵌 − / + 小按钮（20px 方形、圆角 6，正好放进 32 高输入框的内容区）。
+@immutable
+class RaNumberFieldThemeData {
+  const RaNumberFieldThemeData({
+    required this.buttonSize,
+    required this.buttonRadius,
+    required this.buttonGap,
+    required this.iconSize,
+    required this.buttonColor,
+    required this.buttonHoverColor,
+    required this.buttonHoverBackground,
+    required this.buttonDisabledColor,
+  });
+
+  factory RaNumberFieldThemeData.fallback(RaTokens t) => RaNumberFieldThemeData(
+    buttonSize: RaSizes.s20,
+    buttonRadius: t.radii.sm,
+    buttonGap: t.spacing.xs3,
+    iconSize: t.sizing.iconXs,
+    buttonColor: t.colors.ink2,
+    buttonHoverColor: t.colors.ink,
+    buttonHoverBackground: t.colors.hover,
+    buttonDisabledColor: t.colors.disabledInk,
+  );
+
+  final double buttonSize;
+  final double buttonRadius;
+  final double buttonGap;
+  final double iconSize;
+  final Color buttonColor;
+  final Color buttonHoverColor;
+  final Color buttonHoverBackground;
+  final Color buttonDisabledColor;
+}
+
+// ---------------------------------------------------------------------------
+// Toolbar
+// ---------------------------------------------------------------------------
+
+/// 工具栏：一行按钮 / 开关按钮 / 选择器，间距 2；竖向分隔线 16 高、左右各留 4。
+@immutable
+class RaToolbarThemeData {
+  const RaToolbarThemeData({
+    required this.gap,
+    required this.separatorHeight,
+    required this.separatorMargin,
+    required this.separatorColor,
+  });
+
+  factory RaToolbarThemeData.fallback(RaTokens t) => RaToolbarThemeData(
+    gap: t.spacing.xs3,
+    separatorHeight: RaSizes.s16,
+    separatorMargin: t.spacing.xs2,
+    separatorColor: t.colors.border,
+  );
+
+  final double gap;
+  final double separatorHeight;
+  final double separatorMargin;
+  final Color separatorColor;
+}
+
+// ---------------------------------------------------------------------------
+// Accordion
+// ---------------------------------------------------------------------------
+
+/// 手风琴：40 高标题行（13 / 500、右侧箭头展开时朝上），行间 0.5px 分隔线；内容 13px 次要色。
+@immutable
+class RaAccordionThemeData {
+  const RaAccordionThemeData({
+    required this.headerHeight,
+    required this.headerPadding,
+    required this.headerRadius,
+    required this.hoverColor,
+    required this.titleStyle,
+    required this.titleColor,
+    required this.disabledColor,
+    required this.chevronSize,
+    required this.chevronColor,
+    required this.panelPadding,
+    required this.contentStyle,
+    required this.separatorColor,
+  });
+
+  factory RaAccordionThemeData.fallback(RaTokens t) => RaAccordionThemeData(
+    headerHeight: RaSizes.s40,
+    headerPadding: EdgeInsets.symmetric(horizontal: t.spacing.sm),
+    headerRadius: t.radii.md,
+    hoverColor: t.colors.fillTranslucentHover,
+    titleStyle: t.typography.bodyMedium,
+    titleColor: t.colors.ink,
+    disabledColor: t.colors.disabledInk,
+    chevronSize: t.sizing.iconSm,
+    chevronColor: t.colors.ink3,
+    panelPadding: EdgeInsets.fromLTRB(t.spacing.sm, 0, t.spacing.sm, t.spacing.lg),
+    contentStyle: t.typography.body.copyWith(color: t.colors.ink2),
+    separatorColor: t.colors.border,
+  );
+
+  final double headerHeight;
+  final EdgeInsets headerPadding;
+  final double headerRadius;
+  final Color hoverColor;
+  final TextStyle titleStyle;
+  final Color titleColor;
+  final Color disabledColor;
+  final double chevronSize;
+  final Color chevronColor;
+  final EdgeInsets panelPadding;
+  final TextStyle contentStyle;
+  final Color separatorColor;
+}
+
+// ---------------------------------------------------------------------------
+// Fieldset
+// ---------------------------------------------------------------------------
+
+/// 字段组：标题（13 / 500）+ 可选说明（12px 次要色），下方为一组控件。
+@immutable
+class RaFieldsetThemeData {
+  const RaFieldsetThemeData({
+    required this.legendStyle,
+    required this.descriptionStyle,
+    required this.legendGap,
+    required this.gap,
+  });
+
+  factory RaFieldsetThemeData.fallback(RaTokens t) => RaFieldsetThemeData(
+    legendStyle: t.typography.bodyMedium.copyWith(color: t.colors.ink),
+    descriptionStyle: t.typography.caption.copyWith(color: t.colors.ink2),
+    legendGap: t.spacing.xs3,
+    gap: t.spacing.lg,
+  );
+
+  final TextStyle legendStyle;
+  final TextStyle descriptionStyle;
+
+  /// 标题与说明的间距。
+  final double legendGap;
+
+  /// 标题区与控件、控件之间的间距。
+  final double gap;
+}
+
+// ---------------------------------------------------------------------------
 // Icon
 // ---------------------------------------------------------------------------
 
@@ -1135,6 +2116,8 @@ class RaIconSet {
     required this.chevronLeft,
     required this.caretDown,
     required this.caretRight,
+    required this.minus,
+    required this.plus,
     required this.close,
     required this.search,
     required this.circleCheck,
@@ -1152,6 +2135,8 @@ class RaIconSet {
     chevronLeft: RaGlyphs.chevronLeft,
     caretDown: RaGlyphs.caretDown,
     caretRight: RaGlyphs.caretRight,
+    minus: RaGlyphs.minus,
+    plus: RaGlyphs.plus,
     close: RaGlyphs.x,
     search: RaGlyphs.search,
     circleCheck: RaGlyphs.circleCheck,
@@ -1172,6 +2157,12 @@ class RaIconSet {
 
   /// 实心小三角 ▸（子菜单）。
   final RaGlyph caretRight;
+
+  /// 横线（复选框的「部分选中」）。
+  final RaGlyph minus;
+
+  /// 加号（数字输入框）。
+  final RaGlyph plus;
   final RaGlyph close;
   final RaGlyph search;
   final RaGlyph circleCheck;
@@ -1188,6 +2179,8 @@ class RaIconSet {
     RaGlyph? chevronLeft,
     RaGlyph? caretDown,
     RaGlyph? caretRight,
+    RaGlyph? minus,
+    RaGlyph? plus,
     RaGlyph? close,
     RaGlyph? search,
     RaGlyph? circleCheck,
@@ -1204,6 +2197,8 @@ class RaIconSet {
       chevronLeft: chevronLeft ?? this.chevronLeft,
       caretDown: caretDown ?? this.caretDown,
       caretRight: caretRight ?? this.caretRight,
+      minus: minus ?? this.minus,
+      plus: plus ?? this.plus,
       close: close ?? this.close,
       search: search ?? this.search,
       circleCheck: circleCheck ?? this.circleCheck,

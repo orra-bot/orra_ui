@@ -63,7 +63,7 @@ void main() {
     expect(size.height, 32);
   });
 
-  testWidgets('hover appears instantly and fades out over 150ms', (WidgetTester tester) async {
+  testWidgets('hover appears instantly and fades out over 75ms', (WidgetTester tester) async {
     await pumpRa(
       tester,
       RaButton(variant: RaButtonVariant.primary, onPressed: () {}, child: const Text('Primary')),
@@ -76,11 +76,11 @@ void main() {
 
     await mouse.moveTo(const Offset(1200, 800));
     await tester.pump();
-    await tester.pump(const Duration(milliseconds: 75));
+    await tester.pump(const Duration(milliseconds: 37));
     final Color mid = _bg(tester, 'Primary')!;
     expect(mid, isNot(theme.colors.accent));
     expect(mid, isNot(theme.colors.accentHover));
-    await tester.pump(const Duration(milliseconds: 80));
+    await tester.pump(const Duration(milliseconds: 40));
     expect(_bg(tester, 'Primary'), theme.colors.accent);
   });
 
@@ -207,5 +207,18 @@ void main() {
     expect(bg.a, lessThan(1));
     await mouse.moveTo(const Offset(1200, 800));
     await tester.pumpAndSettle();
+  });
+
+  testWidgets('white buttons hover to the light opaque surfaceHover, not the dark overlay', (
+    WidgetTester tester,
+  ) async {
+    final RaThemeData theme = RaThemeData.light();
+    await pumpRa(tester, RaButton(onPressed: () {}, child: const Text('次要')));
+    final TestGesture mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    await mouse.addPointer(location: tester.getCenter(find.byType(RaButton)));
+    await tester.pumpAndSettle();
+    final Color hover = decoratedColor(tester, find.byType(RaButton))!;
+    expect(hover, theme.colors.surfaceHover);
+    expect(hover.a, 1);
   });
 }

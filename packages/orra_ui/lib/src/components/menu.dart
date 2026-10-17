@@ -149,12 +149,24 @@ class RaMenuTrigger extends StatelessWidget {
   Widget build(BuildContext context) {
     final RaThemeData theme = RaTheme.of(context);
     final RaMenuHandle menu = RaMenu.of(context);
-    final RaButtonStyle style = switch (variant) {
+    RaButtonStyle style = switch (variant) {
       RaMenuTriggerVariant.pill => theme.menu.triggerPill,
       RaMenuTriggerVariant.chip => theme.menu.triggerChip,
       RaMenuTriggerVariant.row => theme.menu.triggerRow,
     };
+    if (leading == null && variant == RaMenuTriggerVariant.pill) {
+      style = style.copyWith(padding: theme.menu.triggerPillPlainPadding);
+    } else if (leading == null && variant == RaMenuTriggerVariant.chip) {
+      style = style.copyWith(padding: theme.menu.triggerChipPlainPadding);
+    }
     final Widget button = RaButton(
+      // chip / row 平时透明：以安静按钮为底，不继承次要按钮的描边与阴影。
+      variant: variant == RaMenuTriggerVariant.pill
+          ? RaButtonVariant.secondary
+          : RaButtonVariant.quiet,
+      hoverExitDuration: variant == RaMenuTriggerVariant.row
+          ? theme.sidebar.hoverExitDuration
+          : null,
       onPressed: enabled ? menu.toggle : null,
       selected: menu.isOpen,
       style: style,

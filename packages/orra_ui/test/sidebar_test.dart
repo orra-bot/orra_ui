@@ -102,6 +102,18 @@ void main() {
     await tester.pumpAndSettle();
   });
 
+  testWidgets('hover fill disappears at once when the pointer leaves', (WidgetTester tester) async {
+    await pumpRa(tester, sidebar());
+    final TestGesture mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    await mouse.addPointer(location: tester.getCenter(_item('子会话')));
+    await tester.pumpAndSettle();
+    expect(_bg(tester, '子会话'), theme.chrome.chromeHover);
+    await mouse.moveTo(const Offset(1000, 600));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 16));
+    expect(_bg(tester, '子会话')?.a ?? 0, 0);
+  });
+
   testWidgets('section head: 28 high, hover fill, caret always visible', (
     WidgetTester tester,
   ) async {

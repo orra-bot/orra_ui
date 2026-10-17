@@ -5,7 +5,7 @@ import 'hairline.dart';
 
 /// 带状态过渡的表面：底色、描边色、前景色（文字与图标）随 [duration] 过渡。
 ///
-/// [duration] 由 RaPressable 按状态变化给出（悬停出现 0、移开 150ms、按下 100ms），
+/// [duration] 由 RaPressable 按状态变化给出（悬停出现 0、移开 75ms、按下 50ms），
 /// 每次变化都用当次的时长，因此能做到「出现立即、消失淡出」。
 class RaAnimatedSurface extends ImplicitlyAnimatedWidget {
   const RaAnimatedSurface({

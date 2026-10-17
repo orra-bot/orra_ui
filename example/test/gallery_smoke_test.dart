@@ -14,7 +14,9 @@ Future<void> _browseAllPages(WidgetTester tester) async {
 
   for (final GalleryRoute route in GalleryRoute.values) {
     await tester.tap(find.widgetWithText(RaSidebarItem, route.label));
-    await tester.pumpAndSettle();
+    // 有的页面带持续动画（不确定进度条），不能等到「静止」：按固定时长推进。
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 1));
     expect(tester.takeException(), isNull, reason: route.label);
   }
 

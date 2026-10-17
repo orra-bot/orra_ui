@@ -180,6 +180,13 @@ abstract final class RaGlyphs {
   static const RaGlyph caretRight = RaPathGlyph(<RaGlyphShape>[
     RaGlyphPolyline(<double>[8, 5, 8, 19, 17, 12], filled: true),
   ]);
+  static const RaGlyph plus = RaPathGlyph(<RaGlyphShape>[
+    RaGlyphPolyline(<double>[5, 12, 19, 12]),
+    RaGlyphPolyline(<double>[12, 5, 12, 19]),
+  ]);
+  static const RaGlyph minus = RaPathGlyph(<RaGlyphShape>[
+    RaGlyphPolyline(<double>[5, 12, 19, 12]),
+  ]);
   static const RaGlyph x = RaPathGlyph(<RaGlyphShape>[
     RaGlyphPolyline(<double>[18, 6, 6, 18]),
     RaGlyphPolyline(<double>[6, 6, 18, 18]),

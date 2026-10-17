@@ -44,7 +44,7 @@ class RaPressState {
 
   final Set<WidgetState> states;
 
-  /// Linear 的节奏：悬停出现立即生效、移开淡出 150ms、按下 100ms。
+  /// Linear 的节奏：悬停出现立即生效、移开淡出 75ms、按下 50ms。
   final Duration transition;
 
   bool get hovered => states.contains(WidgetState.hovered);
@@ -79,7 +79,12 @@ class RaPressable extends StatefulWidget {
     this.semanticLabel,
     this.semanticsButton = true,
     this.excludeSemantics = false,
+    this.semanticsChecked,
+    this.semanticsMixed,
+    this.semanticsToggled,
+    this.semanticsInMutuallyExclusiveGroup,
     this.pressOnDown = false,
+    this.hoverExitDuration,
   });
 
   final RaPressableBuilder builder;
@@ -107,8 +112,21 @@ class RaPressable extends StatefulWidget {
   final bool semanticsButton;
   final bool excludeSemantics;
 
+  /// 复选框 / 单选项的勾选状态；[semanticsMixed] 为「部分选中」。
+  final bool? semanticsChecked;
+  final bool? semanticsMixed;
+
+  /// 开关的开合状态。
+  final bool? semanticsToggled;
+
+  /// 单选组中的一项。
+  final bool? semanticsInMutuallyExclusiveGroup;
+
   /// 按下即触发（标签页：按下即选中，不等松开）。
   final bool pressOnDown;
+
+  /// 悬停移开时的过渡时长；为空时用主题的基础时长（75ms 淡出）。
+  final Duration? hoverExitDuration;
 
   bool get enabled => onPressed != null;
 
@@ -148,6 +166,9 @@ class _RaPressableState extends State<RaPressable> {
     bool removed(WidgetState s) => !next.contains(s) && prev.contains(s);
     if (added(WidgetState.hovered) || added(WidgetState.selected)) return theme.motion.instant;
     if (added(WidgetState.pressed) || removed(WidgetState.pressed)) return theme.motion.fast;
+    if (removed(WidgetState.hovered) && widget.hoverExitDuration != null) {
+      return widget.hoverExitDuration!;
+    }
     return theme.motion.base;
   }
 
@@ -225,6 +246,10 @@ class _RaPressableState extends State<RaPressable> {
         button: widget.semanticsButton,
         enabled: enabled,
         selected: widget.selected ? true : null,
+        checked: widget.semanticsChecked,
+        mixed: widget.semanticsMixed,
+        toggled: widget.semanticsToggled,
+        inMutuallyExclusiveGroup: widget.semanticsInMutuallyExclusiveGroup,
         label: widget.semanticLabel,
         excludeSemantics: widget.excludeSemantics,
         onTap: enabled ? widget.onPressed : null,

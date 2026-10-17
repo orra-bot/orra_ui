@@ -57,6 +57,7 @@ class RaSidebarItem extends StatelessWidget {
       onSecondaryTapUp: onSecondaryTapUp,
       selected: selected,
       focusNode: focusNode,
+      hoverExitDuration: s.hoverExitDuration,
       semanticLabel: label,
       excludeSemantics: true,
       builder: (BuildContext context, RaPressState state) {
@@ -173,7 +174,7 @@ class _RaSidebarSectionState extends State<RaSidebarSection> with SingleTickerPr
       _headHovered = value;
       _headTransition = RaReducedMotion.resolve(
         context,
-        value ? theme.motion.instant : theme.motion.base,
+        value ? theme.motion.instant : theme.sidebar.hoverExitDuration,
       );
     });
   }

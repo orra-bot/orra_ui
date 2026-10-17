@@ -7,17 +7,25 @@ import 'package:orra_ui/orra_ui.dart';
 import 'brand_themes.dart';
 import 'gallery_layout.dart';
 import 'pages/buttons_page.dart';
+import 'pages/controls_page.dart';
+import 'pages/display_page.dart';
 import 'pages/fields_page.dart';
 import 'pages/menus_page.dart';
 import 'pages/overlays_page.dart';
 import 'pages/sidebar_page.dart';
+import 'pages/structure_page.dart';
 import 'pages/tokens_page.dart';
+import 'pages/values_page.dart';
 
 /// 展示页。
 enum GalleryRoute {
   tokens('设计变量', LucideIcons.swatchBook),
   buttons('按钮', LucideIcons.mousePointerClick),
   fields('输入框', LucideIcons.textCursorInput),
+  controls('选择控件', LucideIcons.squareCheck),
+  display('数据展示', LucideIcons.tags),
+  numbers('数值与进度', LucideIcons.slidersHorizontal),
+  structure('工具栏与分组', LucideIcons.panelTop),
   menus('菜单', LucideIcons.menu),
   overlays('对话框与提示', LucideIcons.messageSquare),
   sidebar('侧栏', LucideIcons.panelLeft);
@@ -31,6 +39,10 @@ enum GalleryRoute {
     GalleryRoute.tokens => const TokensPage(),
     GalleryRoute.buttons => const ButtonsPage(),
     GalleryRoute.fields => const FieldsPage(),
+    GalleryRoute.controls => const ControlsPage(),
+    GalleryRoute.display => const DisplayPage(),
+    GalleryRoute.numbers => const ValuesPage(),
+    GalleryRoute.structure => const StructurePage(),
     GalleryRoute.menus => const MenusPage(),
     GalleryRoute.overlays => const OverlaysPage(),
     GalleryRoute.sidebar => const SidebarPage(),

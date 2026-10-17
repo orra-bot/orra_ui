@@ -9,6 +9,11 @@ abstract class RaLocalizations {
   String get confirm;
   String get close;
   String get processing;
+  String get loading;
+  String get loadFailed;
+  String get retry;
+  String get retrying;
+  String get noResults;
   String get dismissNotification;
   String get cut;
   String get copy;
@@ -40,6 +45,16 @@ class RaLocalizationsZh extends RaLocalizations {
   @override
   String get processing => '处理中…';
   @override
+  String get loading => '正在加载…';
+  @override
+  String get loadFailed => '加载失败';
+  @override
+  String get retry => '重试';
+  @override
+  String get retrying => '重试中…';
+  @override
+  String get noResults => '没有匹配项';
+  @override
   String get dismissNotification => '关闭提示';
   @override
   String get cut => '剪切';
@@ -70,6 +85,16 @@ class RaLocalizationsEn extends RaLocalizations {
   String get close => 'Close';
   @override
   String get processing => 'Working…';
+  @override
+  String get loading => 'Loading…';
+  @override
+  String get loadFailed => 'Couldn’t load';
+  @override
+  String get retry => 'Retry';
+  @override
+  String get retrying => 'Retrying…';
+  @override
+  String get noResults => 'No results';
   @override
   String get dismissNotification => 'Dismiss';
   @override

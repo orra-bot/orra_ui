@@ -57,7 +57,7 @@ orra_ui **只依赖 Flutter 的 widgets 层**，不引入 Material，也不引�
   - 侧栏可开合，动画过程中内容被裁切而不是挤压重排。
   - 记住窗口位置；macOS 有原生菜单栏；所有平台都有全局快捷键。
 - **交互细节到位**：
-  - 悬停底色立即出现，移开后 150ms 淡出。
+  - 悬停底色立即出现，移开后 75ms 淡出。
   - 颜色按预乘 alpha 插值，与 CSS 一致。
   - 菜单从触发位置展开。
   - 全面尊重系统的「减弱动态效果」设置。
@@ -244,6 +244,21 @@ cd example && flutter run -d macos   # 或 -d windows / -d linux / -d chrome
 | `RaDialog` / `showRaDialog` / `showRaConfirmDialog` | 宽 `min(460, 窗口宽 − 32)`。确认框自带进行中和出错状态，取代 `confirm()`。 |
 | `RaToast` | 显示在右下角，5 秒后自动消失，悬停时暂停；最多同时 3 条。 |
 | `RaSidebarSection` / `RaSidebarItem` / `RaStatusDot` | 行高 28。悬停、选中、按下都只用半透明叠加色。 |
+| `RaCheckbox` / `RaRadioGroup` / `RaSwitch` | 14px 方框 / 圆框，开关 28 × 16；选中用强调色。整行（标签与说明）可点击。复选框支持「部分选中」（`value: null`）。 |
+| `RaSelect` | 设置页选择框：30 高、圆角 8、右侧小箭头；选项以菜单单选项弹出，选中即关闭。 |
+| `RaTabs` | 横排或竖排的页面内标签：行高 32，只用半透明叠加色；按下即切换。`RaTabs.withPanels` 附带内容区。 |
+| `RaSegmentedControl` | 模式切换（如「对话 \| 调整」）：凹陷底槽，选中段浮起。 |
+| `RaTag` / `RaCountTag` | 20 高状态标签，七种语气（可带圆点，`outline` 为虚线）；未读计数徽标。 |
+| `RaSideCard` / `RaPropertyRow` | Linear 右侧栏属性卡片：标题可折叠，标签列 90。 |
+| `RaCollapsible` / `RaCollapsiblePanel` | 折叠面板；内容区高度过渡，收起后不可聚焦、对读屏隐藏。 |
+| `RaLoadingState` / `RaEmptyState` / `RaErrorState` / `RaSkeleton` | 加载、空（虚线框）、失败（带重试）状态块。 |
+| `RaDrawer` / `showRaDrawer` | 从右侧滑出的面板，宽 `min(360, 窗口宽 × 92%)`；窄窗口下代替右侧栏。 |
+| `RaPopover` / `RaPopoverPanel` / `RaPreviewCard` | 锚定弹出面板（焦点移入，Esc 或点外部关闭并还焦点）；悬停 600ms 打开、指针可移入的预览卡。 |
+| `RaCombobox` / `RaAutocomplete` | 输入即过滤；↑ ↓ Enter Esc，焦点留在输入框。组合框只能选列表项，自动补全允许自由输入。 |
+| `RaSlider` / `RaNumberField` | 键盘步进（Shift 大步、Home / End）；数字输入框内嵌 − / +，失焦时夹值。 |
+| `RaProgress` / `RaMeter` | 4px 进度条 / 计量条，可带标签与数值；不确定进度；计量条按阈值变色。 |
+| `RaToggle` / `RaToggleGroup` / `RaToolbar` | 两态按钮、单选或多选开关组；工具栏内方向键移动焦点（输入框内不拦截）。 |
+| `RaAccordion` / `RaCheckboxGroup` / `RaFieldset` | 单开或多开手风琴；带「全选」父项的复选框组；可整组禁用的字段组。 |
 | `RaScrollbar`、`RaSeparator`、`RaAvatar`、`RaSpinner`、`RaSidebarIcon` | 配套组件。 |
 
 底层构件同样公开：
@@ -252,6 +267,8 @@ cd example && flutter run -d macos   # 或 -d windows / -d linux / -d chrome
 - `RaAnimatedSurface`
 - `RaPopoverPositioner`
 - `RaHairline`
+- `RaRovingGroup`：单选类组件的方向键 / Home / End 导航
+- `RaDashedBorder`：虚线圆角描边
 
 ## 窗口外壳
 
@@ -268,7 +285,7 @@ cd example && flutter run -d macos   # 或 -d windows / -d linux / -d chrome
 └──────────────────────────────┴──────────────── 距窗口边缘 8px ──────────┘
 ```
 
-- **侧栏**：在 238 ↔ 8px 之间过渡，300ms，缓动 `cubic-bezier(0.22, 1, 0.36, 1)`。展开和收起都是先快后慢，中途可以反向。内容被裁切而不是重排。收起后对鼠标、焦点和读屏都隐藏。
+- **侧栏**：在 238 ↔ 8px 之间过渡，150ms，缓动 `cubic-bezier(0.22, 1, 0.36, 1)`。展开和收起都是先快后慢，中途可以反向。内容被裁切而不是重排。收起后对鼠标、焦点和读屏都隐藏。
 - **macOS**：红绿灯由附带的原生插件对齐到 44px 标题栏的中线；窗口缩放、全屏切换后会自动重新定位。
 - **Windows / Linux**：最小化、最大化、关闭按钮由外壳绘制，关闭按钮悬停时显示系统红。
 - **网页端**：布局相同。没有红绿灯和窗口按钮，按钮组从左 12px 开始；拖动、双击标题栏不执行任何操作。用 `RaShellPlatform.current` 判断当前宿主。
@@ -405,7 +422,10 @@ cd packages/orra_desktop_shell && flutter test --platform chrome test/web_test.d
 - [x] 网页端支持（同一套组件与外壳在浏览器中运行）
 - [ ] Chrome 式标签栏（每个标签页有独立历史、拖动排序、重新打开已关闭的标签页）
 - [ ] 命令面板（⌘K）
-- [ ] Tabs、SegmentedControl、SideCard / PropertyRow、Drawer
+- [x] Tabs、SegmentedControl、SideCard / PropertyRow、Drawer、Tag、状态块
+- [x] Checkbox、RadioGroup、Switch、Select
+- [x] Popover、PreviewCard、Combobox、Autocomplete、Slider、NumberField、Progress、Meter、Toggle、ToggleGroup、Toolbar、Accordion、CheckboxGroup、Fieldset
+- [ ] 验证码输入（OTP）、区间滑杆
 - [ ] Composer、对话列表、Markdown
 - [ ] 设置页版式
 - [ ] 主题编辑器（OKLCH 推导自定义主题）

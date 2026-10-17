@@ -363,10 +363,10 @@ class RaShadows {
 class RaMotion {
   const RaMotion({
     this.instant = RaDurations.ms0,
-    this.fast = RaDurations.ms100,
-    this.base = RaDurations.ms150,
-    this.slow = RaDurations.ms250,
-    this.layout = RaDurations.ms300,
+    this.fast = RaDurations.ms50,
+    this.base = RaDurations.ms75,
+    this.slow = RaDurations.ms125,
+    this.layout = RaDurations.ms150,
     this.spin = RaDurations.ms800,
     this.emphasized = RaCurves.outExpo,
     this.scalePop = RaNumbers.scale96,

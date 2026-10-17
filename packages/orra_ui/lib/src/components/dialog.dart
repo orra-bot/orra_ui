@@ -32,7 +32,7 @@ Future<T?> showRaDialog<T>({
   );
 }
 
-/// 对话框路由：遮罩淡入；卡片淡入并从下方 2% 处移到中心。
+/// 对话框路由：遮罩淡入；卡片从 0.96 缩放到 1 并淡入，关闭时反向。
 class RaDialogRoute<T> extends PopupRoute<T> {
   RaDialogRoute({
     required this.builder,
@@ -74,15 +74,10 @@ class RaDialogRoute<T> extends PopupRoute<T> {
     Animation<double> secondaryAnimation,
     Widget child,
   ) {
-    final double offset = theme.dialog.enterOffsetFraction;
     return FadeTransition(
       opacity: animation,
-      child: AnimatedBuilder(
-        animation: animation,
-        builder: (BuildContext context, Widget? child) => FractionalTranslation(
-          translation: Offset(0, offset * (1 - animation.value)),
-          child: child,
-        ),
+      child: ScaleTransition(
+        scale: Tween<double>(begin: theme.dialog.scale, end: 1).animate(animation),
         child: child,
       ),
     );
