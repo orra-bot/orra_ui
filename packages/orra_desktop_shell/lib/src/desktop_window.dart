@@ -7,11 +7,12 @@ import 'package:path_provider/path_provider.dart';
 import 'package:screen_retriever/screen_retriever.dart';
 import 'package:window_manager/window_manager.dart';
 
+import 'shell_platform.dart';
 import 'shell_theme.dart';
 import 'window_controller.dart';
 import 'window_state.dart';
 
-/// 主窗口选项。
+/// 主窗口选项。网页端只使用 [theme] / [darkTheme]（页面底色），其余选项由浏览器决定。
 @immutable
 class RaWindowOptions {
   const RaWindowOptions({
@@ -44,16 +45,23 @@ class RaWindowOptions {
 /// - 隐藏系统标题栏（macOS 保留红绿灯并按标题栏中线定位；Windows / Linux 由 RaDesktopFrame 绘制窗口按钮）；
 /// - 窗口底色 = 主题的 chrome（浅 / 深），首帧渲染前不显示窗口，避免闪色；
 /// - 恢复上次的位置与尺寸（校验格式，并确认至少 100×50 落在某个显示器内）。
+///
+/// 网页端：只把页面底色设为主题的 chrome（窗口尺寸、位置与标题栏由浏览器负责），同一份 `main` 可直接运行。
 abstract final class RaDesktopWindow {
   static Future<void> ensureInitialized([RaWindowOptions options = const RaWindowOptions()]) async {
     WidgetsFlutterBinding.ensureInitialized();
-    await windowManager.ensureInitialized();
 
     final bool dark = PlatformDispatcher.instance.platformBrightness == Brightness.dark;
     final RaThemeData theme = dark
         ? (options.darkTheme ?? RaThemeData.dark())
         : (options.theme ?? RaThemeData.light());
     final RaShellThemeData shell = theme.extension<RaShellThemeData>(RaShellThemeData.fallback);
+
+    if (RaShellPlatform.current == RaShellPlatform.web) {
+      await raDefaultWindowController.setBackgroundColor(shell.chrome);
+      return;
+    }
+    await windowManager.ensureInitialized();
 
     RaWindowStateStore? store;
     RaWindowState? saved;

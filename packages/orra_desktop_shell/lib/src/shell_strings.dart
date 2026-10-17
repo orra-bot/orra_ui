@@ -1,5 +1,6 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
+
+import 'shell_platform.dart';
 
 /// 外壳内置文案（中文 / 英文，按当前 Locale 选择）。
 @immutable
@@ -15,7 +16,7 @@ class RaShellStrings {
 
   static RaShellStrings of(BuildContext context) {
     final bool en = Localizations.maybeLocaleOf(context)?.languageCode == 'en';
-    final bool mac = defaultTargetPlatform == TargetPlatform.macOS;
+    final bool mac = raUsesCommandKey;
     return en
         ? RaShellStrings._(
             windowControls: 'Window',
@@ -42,7 +43,7 @@ class RaShellStrings {
   final String forward;
   final bool isMac;
 
-  /// 快捷键显示：macOS「⌘K」，其他平台「Ctrl+K」。
+  /// 快捷键显示：macOS（含 Mac 上的浏览器）「⌘K」，其他平台「Ctrl+K」。
   String shortcut(String key, {bool shift = false}) =>
       isMac ? '${shift ? '⇧' : ''}⌘$key' : 'Ctrl+${shift ? 'Shift+' : ''}$key';
 }

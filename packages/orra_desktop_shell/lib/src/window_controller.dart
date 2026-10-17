@@ -5,7 +5,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:window_manager/window_manager.dart';
 
-/// 外壳对窗口的操作。默认实现基于 window_manager；测试中可通过 [RaWindowScope] 注入假实现。
+import 'browser/page_style.dart' if (dart.library.js_interop) 'browser/page_style_web.dart';
+import 'shell_platform.dart';
+
+/// 外壳对窗口的操作。默认实现：桌面端基于 window_manager（[RaWindowManagerController]），
+/// 网页端为 [RaBrowserWindowController]；测试中可通过 [RaWindowScope] 注入假实现。
 abstract class RaWindowController {
   /// 开始拖动窗口（在标题栏空白处按下并移动时调用）。
   Future<void> startDragging();
@@ -83,6 +87,39 @@ class RaWindowManagerController with WindowListener implements RaWindowControlle
   void onWindowUnmaximize() => _maximized.value = false;
 }
 
+/// 网页端实现：浏览器标签页无法被页面拖动、最小化或关闭，这些操作都不执行；
+/// 窗口底色同步为页面底色与 `theme-color`。
+class RaBrowserWindowController implements RaWindowController {
+  RaBrowserWindowController._();
+
+  static final RaBrowserWindowController instance = RaBrowserWindowController._();
+
+  static final ValueListenable<bool> _maximized = ValueNotifier<bool>(false);
+
+  @override
+  ValueListenable<bool> get maximized => _maximized;
+
+  @override
+  Future<void> startDragging() async {}
+
+  @override
+  Future<void> toggleMaximize() async {}
+
+  @override
+  Future<void> minimize() async {}
+
+  @override
+  Future<void> close() async {}
+
+  @override
+  Future<void> setBackgroundColor(Color color) async => setPageBackgroundColor(color);
+}
+
+/// 当前宿主的默认窗口实现。
+RaWindowController get raDefaultWindowController => RaShellPlatform.current == RaShellPlatform.web
+    ? RaBrowserWindowController.instance
+    : RaWindowManagerController.instance;
+
 /// 向下提供 [RaWindowController]。
 class RaWindowScope extends InheritedWidget {
   const RaWindowScope({super.key, required this.controller, required super.child});
@@ -91,7 +128,7 @@ class RaWindowScope extends InheritedWidget {
 
   static RaWindowController of(BuildContext context) =>
       context.dependOnInheritedWidgetOfExactType<RaWindowScope>()?.controller ??
-      RaWindowManagerController.instance;
+      raDefaultWindowController;
 
   @override
   bool updateShouldNotify(RaWindowScope old) => controller != old.controller;

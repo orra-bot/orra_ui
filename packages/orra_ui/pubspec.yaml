@@ -1,6 +1,7 @@
 name: orra_ui
-description: 面向 Flutter 桌面端的可配置设计系统与组件库（默认 Linear 风格主题）。
+description: "A configurable design system and component library for Flutter desktop (macOS, Windows, Linux) and the web."
 version: 0.1.0
+repository: https://github.com/orra-bot/orra_ui
 publish_to: none
 resolution: workspace
 

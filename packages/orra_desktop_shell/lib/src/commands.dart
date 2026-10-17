@@ -1,6 +1,7 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+
+import 'shell_platform.dart';
 
 /// 菜单栏中的一项。
 @immutable
@@ -59,7 +60,8 @@ class RaMenuBarMenu {
 /// 应用菜单栏与快捷键（「桌面习惯优先」）。
 ///
 /// - macOS：生成原生菜单栏（第一个菜单为应用菜单：关于 / 隐藏 / 退出），快捷键由系统菜单提供；
-/// - Windows / Linux：不显示菜单栏，同一套快捷键全局生效。
+/// - Windows / Linux / 网页：不显示菜单栏，同一套快捷键全局生效。
+///   网页端被处理的按键会阻止浏览器默认行为（如 ⌘[ 后退）；浏览器保留的组合键（⌘W、⌘T、⌘N 等）页面收不到。
 ///
 /// 只需要快捷键、不需要显示的命令设 `visible: false`。
 class RaAppMenuBar extends StatefulWidget {
@@ -74,7 +76,7 @@ class RaAppMenuBar extends StatefulWidget {
 }
 
 class _RaAppMenuBarState extends State<RaAppMenuBar> {
-  bool get _nativeMenus => !kIsWeb && defaultTargetPlatform == TargetPlatform.macOS;
+  bool get _nativeMenus => RaShellPlatform.current.hasNativeMenuBar;
 
   @override
   void initState() {
@@ -179,8 +181,8 @@ class _RaAppMenuBarState extends State<RaAppMenuBar> {
   }
 }
 
-/// 平台主修饰键的快捷键：macOS 为 ⌘，Windows / Linux 为 Ctrl。
+/// 平台主修饰键的快捷键：macOS 为 ⌘，Windows / Linux 为 Ctrl；网页端按用户的操作系统选择。
 SingleActivator raPrimaryShortcut(LogicalKeyboardKey key, {bool shift = false, bool alt = false}) {
-  final bool mac = !kIsWeb && defaultTargetPlatform == TargetPlatform.macOS;
+  final bool mac = raUsesCommandKey;
   return SingleActivator(key, meta: mac, control: !mac, shift: shift, alt: alt);
 }

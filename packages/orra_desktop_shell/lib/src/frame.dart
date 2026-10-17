@@ -1,12 +1,12 @@
 import 'dart:ui' show lerpDouble;
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:orra_ui/orra_ui.dart';
 
 import 'caption_buttons.dart';
 import 'desktop_window.dart';
 import 'drag_area.dart';
+import 'shell_platform.dart';
 import 'shell_strings.dart';
 import 'shell_theme.dart';
 
@@ -24,6 +24,9 @@ import 'shell_theme.dart';
 ///
 /// 侧栏在 238 ↔ 8 之间过渡（300ms、cubic-bezier(0.22, 1, 0.36, 1)，可中途反向）；内部保持 238 宽被裁切，
 /// 收起动画结束后才隐藏（不可点、不可聚焦、读屏不读），展开时立即可见。
+///
+/// 网页端（[RaShellPlatform.web]）结构不变：标题栏保留为页面顶栏（侧栏开关、后退 / 前进、标签栏），
+/// 但没有红绿灯与窗口按钮，按钮组从左 12 开始；拖动、双击最大化不执行。
 class RaDesktopFrame extends StatefulWidget {
   const RaDesktopFrame({
     super.key,
@@ -62,35 +65,38 @@ class RaDesktopFrame extends StatefulWidget {
 }
 
 class _RaDesktopFrameState extends State<RaDesktopFrame> with SingleTickerProviderStateMixin {
-  late final AnimationController _resize = AnimationController(
-    vsync: this,
-    value: widget.sidebarOpen ? 1 : 0,
-  );
-  late final CurvedAnimation _curve = CurvedAnimation(parent: _resize, curve: Curves.linear);
+  /// 当前这一次过渡的线性进度（0 → 1）。
+  ///
+  /// 与 CSS 过渡一致：展开和收起都从当前位置出发、按时间正向套用缓动（先快后慢），
+  /// 中途反向也从当前位置连续过渡。不用 `reverse()`——那会把缓动曲线倒着走，收起变成先慢后快。
+  late final AnimationController _resize = AnimationController(vsync: this, value: 1);
+  late double _from = widget.sidebarOpen ? 1 : 0;
+  late double _to = _from;
+  Curve _curve = Curves.linear;
+
+  /// 侧栏展开程度：0 = 收起，1 = 展开。
+  double get _openness => _from + (_to - _from) * _curve.transform(_resize.value);
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     final RaShellThemeData s = RaShellThemeData.of(context);
     _resize.duration = RaReducedMotion.resolve(context, s.resizeDuration);
-    _curve.curve = s.resizeCurve;
+    _curve = s.resizeCurve;
   }
 
   @override
   void didUpdateWidget(RaDesktopFrame oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.sidebarOpen != oldWidget.sidebarOpen) {
-      if (widget.sidebarOpen) {
-        _resize.forward();
-      } else {
-        _resize.reverse();
-      }
+      _from = _openness;
+      _to = widget.sidebarOpen ? 1 : 0;
+      _resize.forward(from: 0);
     }
   }
 
   @override
   void dispose() {
-    _curve.dispose();
     _resize.dispose();
     super.dispose();
   }
@@ -98,16 +104,15 @@ class _RaDesktopFrameState extends State<RaDesktopFrame> with SingleTickerProvid
   @override
   Widget build(BuildContext context) {
     final RaShellThemeData s = RaShellThemeData.of(context);
-    final TargetPlatform platform = defaultTargetPlatform;
-    final bool customCaption =
-        !kIsWeb && (platform == TargetPlatform.windows || platform == TargetPlatform.linux);
+    final RaShellPlatform platform = RaShellPlatform.current;
+    final bool customCaption = platform.drawsCaptionButtons;
     final double controlsLeft = s.controlsLeftFor(platform);
     final double controlsOpenWidth = s.sidebarWidth - s.sidebarPadding.right - controlsLeft;
 
     final Widget frame = AnimatedBuilder(
-      animation: _curve,
+      animation: _resize,
       builder: (BuildContext context, Widget? _) {
-        final double t = _curve.value;
+        final double t = _openness;
         final double shellWidth = lerpDouble(s.panelGap, s.sidebarWidth, t)!;
         final double controlsWidth = lerpDouble(s.controlsWidth, controlsOpenWidth, t)!;
         final double titlebarStart = lerpDouble(
@@ -115,7 +120,7 @@ class _RaDesktopFrameState extends State<RaDesktopFrame> with SingleTickerProvid
           s.sidebarWidth,
           t,
         )!;
-        final bool sidebarHidden = !widget.sidebarOpen && _resize.isDismissed;
+        final bool sidebarHidden = !widget.sidebarOpen && t == 0;
 
         return Stack(
           children: <Widget>[

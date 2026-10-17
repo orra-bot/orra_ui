@@ -166,6 +166,56 @@ void main() {
       expect(tester.getSize(find.byKey(kShell)).width, 238);
     }, variant: TargetPlatformVariant.only(TargetPlatform.macOS));
 
+    testWidgets('展开与收起都是先快后慢（缓动按时间正向套用）', (WidgetTester tester) async {
+      await pumpHost(tester);
+      double width() => tester.getSize(find.byKey(kShell)).width;
+
+      Future<void> expectFastThenSlow() async {
+        final double start = width();
+        await tester.tap(find.byKey(kToggle));
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 150));
+        final double half = width();
+        await tester.pumpAndSettle();
+        final double end = width();
+        final double firstHalf = (half - start).abs();
+        final double secondHalf = (end - half).abs();
+        expect(
+          firstHalf,
+          greaterThan(secondHalf * 3),
+          reason: '前 150ms 走了 $firstHalf，后 150ms 走了 $secondHalf',
+        );
+      }
+
+      await expectFastThenSlow(); // 收起
+      expect(width(), 8);
+      await expectFastThenSlow(); // 展开
+      expect(width(), 238);
+    }, variant: TargetPlatformVariant.only(TargetPlatform.macOS));
+
+    testWidgets('中途反向时从当前位置连续过渡，不跳变', (WidgetTester tester) async {
+      await pumpHost(tester);
+      double width() => tester.getSize(find.byKey(kShell)).width;
+      await tester.tap(find.byKey(kToggle));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 60));
+      final double beforeReverse = width();
+      expect(beforeReverse, inExclusiveRange(8, 238));
+
+      await tester.tap(find.byKey(kToggle));
+      await tester.pump();
+      expect((width() - beforeReverse).abs(), lessThan(1), reason: '反向瞬间不应跳变');
+      double previous = width();
+      for (int i = 0; i < 25; i++) {
+        await tester.pump(const Duration(milliseconds: 16));
+        final double w = width();
+        expect(w, greaterThanOrEqualTo(previous), reason: '反向后应单调展开');
+        previous = w;
+      }
+      await tester.pumpAndSettle();
+      expect(width(), 238);
+    }, variant: TargetPlatformVariant.only(TargetPlatform.macOS));
+
     testWidgets('减弱动态效果时没有中间帧', (WidgetTester tester) async {
       await pumpHost(tester, reduceMotion: true);
       await tester.tap(find.byKey(kToggle));

@@ -1,135 +1,422 @@
+<div align="center">
+
 # orra_ui
 
-面向 Flutter 桌面端（macOS / Windows / Linux）的可配置设计系统与组件库。默认主题对照 Linear，移植自 `saas-desktop-ui-framework` skill（原为 Electron + React + Base UI）。
+**A configurable design system for Flutter desktop and web apps.**
 
-只依赖 Flutter 的 widgets 层，不引入 Material / Cupertino。交互底座使用 widgets 层自带的无样式组件：`RawMenuAnchor`、`RawTooltip`、`EditableText`、`RawScrollbar`、`PopupRoute`。这对应原方案里 Base UI 的角色。
+Native-feeling SaaS apps for macOS, Windows, and Linux, with the same app running in the browser. Ships with a Linear-inspired default theme, and every token can be overridden.
 
-## 仓库结构（pub workspace）
+[![License: MIT](https://img.shields.io/badge/license-MIT-6d78d5.svg)](LICENSE)
+[![Flutter](https://img.shields.io/badge/Flutter-%E2%89%A53.47-02569B?logo=flutter&logoColor=white)](https://flutter.dev)
+[![Dart](https://img.shields.io/badge/Dart-%E2%89%A53.13-0175C2?logo=dart&logoColor=white)](https://dart.dev)
+![Platforms](https://img.shields.io/badge/platforms-macOS%20%7C%20Windows%20%7C%20Linux%20%7C%20Web-lightgrey)
+![No Material](https://img.shields.io/badge/material-not%20required-1b1b1b)
 
+**English** · [简体中文](README.zh-CN.md)
+
+</div>
+
+---
+
+Most Flutter desktop apps feel like a website in a window. orra_ui is meant to make them feel like real desktop apps instead: a frameless window with a solid chrome background, a floating rounded content panel, a dense 13 px type scale, 0.5 px hairlines, barely-there shadows, and keyboard-first interactions. It takes its cues from Linear, Cursor, and the ChatGPT desktop app.
+
+orra_ui is built **only on Flutter's widgets layer**: no Material, no Cupertino. Interaction primitives come from the framework's headless building blocks (`RawMenuAnchor`, `RawTooltip`, `EditableText`, `RawScrollbar`, `PopupRoute`), and orra_ui owns every pixel on top of them.
+
+## Contents
+
+- [Highlights](#highlights)
+- [Packages](#packages)
+- [Getting started](#getting-started)
+- [Components](#components)
+- [Window shell](#window-shell)
+- [Theming](#theming)
+- [Icons](#icons)
+- [Guardrails](#guardrails)
+- [Testing](#testing)
+- [Platform support](#platform-support)
+- [Roadmap](#roadmap)
+- [Contributing](#contributing)
+- [Acknowledgements](#acknowledgements)
+- [License](#license)
+
+## Highlights
+
+- **Three-layer design tokens.** Primitives (raw values) → semantic tokens (purpose; dark mode is defined only here) → component tokens (derived, overridable). Change one gray and everything that uses it follows.
+- **Configurable down to the instance.** Swap the brand color, re-skin a single button variant, or attach your own tokens through theme extensions.
+- **A real desktop shell.**
+  - Frameless window with a 44 px title bar. Traffic lights, window controls, and tabs share a 22 px centerline.
+  - Collapsible sidebar that is clipped, not reflowed, while it animates.
+  - Remembered window bounds, a native macOS menu bar, and global shortcuts on every platform.
+- **Interaction details done right.**
+  - Hover appears instantly and fades out over 150 ms.
+  - Colors interpolate in premultiplied alpha, like CSS.
+  - Menus grow from their trigger.
+  - `prefers-reduced-motion` is respected everywhere.
+- **One codebase, desktop and web.** The same widgets and window shell run in the browser (JavaScript or Wasm). On the web the title bar becomes a page header, window-only features step aside, and shortcuts follow the user's OS (⌘ in a Mac browser, Ctrl elsewhere).
+- **Icon-agnostic.** Built-in Lucide-style glyphs for internal UI. Bring any icon font or SVG for your own content.
+- **Enforced, not remembered.** `orra_guardrails` fails your test suite when someone hard-codes a color, imports Material, or bypasses a component.
+- **Verified by geometry, not screenshots.** Widget tests measure centerlines, insets, and per-frame animation curves.
+
+## Packages
+
+This repository is a [pub workspace](https://dart.dev/tools/pub/workspaces):
+
+| Package | Description |
+| --- | --- |
+| [`orra_ui`](packages/orra_ui) | Design tokens, theme, and components. Pure presentation: no `dart:io`, no window plugins. |
+| [`orra_desktop_shell`](packages/orra_desktop_shell) | Window shell: frame, sidebar, panel, caption buttons, window state, and menu bar. Includes a small macOS plugin. Also runs on the web, where window features are no-ops. |
+| [`orra_guardrails`](packages/orra_guardrails) | Static checks over your source, run from unit tests. |
+| [`example`](example) | `orra_gallery`, a living component gallery for reference and visual QA. |
+
+## Getting started
+
+### Requirements
+
+- Flutter **3.47** or newer (Dart 3.13)
+- A desktop target (macOS 12+, Windows 10+, or Linux with GTK 3) or the web (current Chrome, Edge, Firefox, or Safari)
+
+### Install
+
+The packages are not on pub.dev yet; depend on them from Git. Because `orra_desktop_shell` depends on `orra_ui` inside the same repository, pin `orra_ui` with an override so both resolve to one checkout:
+
+```yaml
+dependencies:
+  orra_ui:
+    git:
+      url: https://github.com/orra-bot/orra_ui
+      path: packages/orra_ui
+  orra_desktop_shell:
+    git:
+      url: https://github.com/orra-bot/orra_ui
+      path: packages/orra_desktop_shell
+
+dependency_overrides:
+  orra_ui:
+    git:
+      url: https://github.com/orra-bot/orra_ui
+      path: packages/orra_ui
 ```
-packages/
-  orra_ui/              组件库（纯展示层，不依赖窗口插件 / dart:io）
-    lib/src/tokens/     三层设计变量：primitives → colors + semantic → components
-    lib/src/theme/      RaThemeData / RaTheme（含主题扩展）
-    lib/src/foundation/ RaApp、RaPressable（悬停 / 按下 / 焦点 / 过渡时长）、浮层定位、细线取整……
-    lib/src/icons/      RaGlyph（不绑定图标库）、内置线条图标、RaIcon、转圈、侧栏开关图标
-    lib/src/components/ Button、IconButton、Tooltip、TextField / Form、Menu、Dialog、Toast、Sidebar、Scrollbar、Separator
-    fonts/              Inter 可变字体（OFL，随包打包）
-  orra_desktop_shell/   窗口外壳（依赖 window_manager；含 macOS 原生插件：红绿灯定位）
-  orra_guardrails/      守护规则：基于 analyzer 语法树的源码检查，在单元测试中运行
-example/                展示应用 orra_gallery（视觉验收入口）
-```
 
-## 用法
+### macOS setup
 
-```dart
-Future<void> main() async {
-  await RaDesktopWindow.ensureInitialized(const RaWindowOptions(title: 'My App'));
-  runApp(
-    RaApp(
-      home: RaDesktopFrame(
-        sidebarOpen: open,
-        onToggleSidebar: toggle,
-        sidebar: Column(children: [
-          RaSidebarSection(title: '运行中', children: [
-            RaSidebarItem(label: '周报生成器', onPressed: () {}, selected: true),
-          ]),
-        ]),
-        child: Column(children: [
-          RaPanelHeader(leading: RaPanelTitle('收件箱'), trailing: RaIconButton(...)),
-          Expanded(child: ...),
-        ]),
-      ),
-    ),
-  );
+To keep the window hidden until the first frame is ready, and to paint the native window in the same color as the chrome, update `macos/Runner/MainFlutterWindow.swift`. Use [`example/macos/Runner/MainFlutterWindow.swift`](example/macos/Runner/MainFlutterWindow.swift) as the reference:
+
+```swift
+import window_manager
+
+class MainFlutterWindow: NSWindow {
+  // ...
+  override public func order(_ place: NSWindow.OrderingMode, relativeTo otherWin: Int) {
+    super.order(place, relativeTo: otherWin)
+    hiddenWindowAtLaunch()
+  }
 }
 ```
 
-业务侧提示与确认统一通过组件库：
+### Web setup
 
-- `RaToast.of(context).success('已保存')`
-- `showRaConfirmDialog(...)`
-- 菜单用 `RaMenu`，提示气泡用 `RaTooltip`
-
-## 配置主题（可配置设计系统）
-
-| 想改什么 | 怎么改 |
-| --- | --- |
-| 品牌色 | `RaThemeData.light(colors: const RaColors.light(accent: …, accentHover: …, accentSoft: …, accentInk: …, selection: …))`。深色用 `RaColors.dark(...)` 另配一套。 |
-| 中性灰、字体、圆角 | `RaThemeData(typography: …, radii: …)`。没有单独覆盖的组件主题会随语义层重新推导。 |
-| 某个组件 | `base.copyWith(button: base.button.withVariant(RaButtonVariant.primary, RaButtonStyle(...)))`。菜单、输入框、Toast 等组件同理。 |
-| 单个实例 | `RaButton(style: RaButtonStyle(...))` |
-| 应用自己的组件变量 | 继承 `RaThemeExtension`，放进 `RaThemeData(extensions: [...])`。可参考 `RaShellThemeData` 和 `example/lib/gallery_layout.dart`。 |
-| 图标 | 组件内部用到的图标在 `theme.icons`（`RaIconSet`）里，默认是内置的 Lucide 同款线条图标。可以用 `RaGlyph.icon(任意 IconData)` 或 `RaGlyph.builder(...)` 逐个替换。业务图标直接写 `RaIcon(LucideIcons.inbox)`，任意图标库都可以。 |
-
-`example/lib/brand_palette.dart → brand_themes.dart` 演示了应用侧如何按三层结构换品牌色。
-
-## 守护规则
-
-`orra_guardrails` 在单元测试里静态检查源码，三个包和示例应用都已接入（各自的 `test/guardrails_test.dart`）。它检查以下几类问题：
-
-- **三层约束**
-  - 只有基础层能写颜色、时长、缓动、字重字面量。
-  - 语义层只允许出现数字 0 / 1。
-  - 组件层可以写布局几何，但不写颜色和时长。
-  - 组件代码不写尺寸 / 字号 / 圆角数字，不直接引用基础层，不感知明暗。
-  - 基础层不留闲置值。
-- **禁用规则**
-  - 任何层都不得导入 `material.dart` / `cupertino.dart`。
-  - 组件库不得导入 `dart:io`、`window_manager`。
-  - 应用层不得直接使用 `EditableText`、`RawMenuAnchor`、`RawTooltip`、`showGeneralDialog` 等未封装的底层组件，也不写颜色。
-
-新应用接入：复制 `example/test/guardrails_test.dart`，把 `targets` 改成自己的目录即可。
-
-## 验证
+The same `main` runs in the browser: on the web, `RaDesktopWindow.ensureInitialized` skips the window plugins and only paints the page in the chrome color. Add the web platform and run it:
 
 ```sh
-# 每个包分别执行
-flutter analyze && flutter test          # packages/orra_ui、packages/orra_desktop_shell、example
-dart analyze && dart test                # packages/orra_guardrails
-cd example && flutter build macos --debug
+flutter create --platforms=web .
+flutter run -d chrome
+flutter build web --wasm   # or plain `flutter build web` for JavaScript
 ```
 
-几何与状态用测试测量，不靠截图：
+To avoid a white flash before Flutter boots, give `web/index.html` the chrome color in both modes. Use [`example/web/index.html`](example/web/index.html) as the reference:
 
-- 标题栏中线 22、面板顶边 44
-- 侧栏开合逐帧单调、有中间帧；减弱动效时没有中间帧
-- 侧栏只用半透明填充
-- 菜单 32 / 14 / 6 规格
-- 对话框 min(460, w−32)
-- 原生窗口底色等于主题 chrome
+```html
+<meta name="theme-color" content="#efeff0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#09090a" media="(prefers-color-scheme: dark)">
+<style>
+  html, body { margin: 0; height: 100%; }
+  body { background-color: #efeff0; }
+  @media (prefers-color-scheme: dark) { body { background-color: #09090a; } }
+</style>
+```
 
-## 与原 skill 的差异
+Once the app is running, `RaDesktopFrame` keeps `<body>` and `theme-color` in sync with the active theme.
 
-| 原方案 | 这里 |
+### Hello, desktop
+
+```dart
+import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
+import 'package:orra_desktop_shell/orra_desktop_shell.dart';
+import 'package:orra_ui/orra_ui.dart';
+
+Future<void> main() async {
+  await RaDesktopWindow.ensureInitialized(const RaWindowOptions(title: 'Acme'));
+  runApp(const RaApp(title: 'Acme', home: Home()));
+}
+
+class Home extends StatefulWidget {
+  const Home({super.key});
+
+  @override
+  State<Home> createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
+  bool _sidebarOpen = true;
+
+  void _toggleSidebar() => setState(() => _sidebarOpen = !_sidebarOpen);
+
+  @override
+  Widget build(BuildContext context) {
+    return RaAppMenuBar(
+      appName: 'Acme',
+      menus: [
+        RaMenuBarMenu(label: 'View', entries: [
+          RaCommand(
+            label: 'Toggle Sidebar',
+            shortcut: raPrimaryShortcut(LogicalKeyboardKey.backslash), // ⌘\ or Ctrl+\
+            onInvoked: _toggleSidebar,
+          ),
+        ]),
+      ],
+      child: RaDesktopFrame(
+        sidebarOpen: _sidebarOpen,
+        onToggleSidebar: _toggleSidebar,
+        sidebar: RaSidebarSection(title: 'Workspace', children: [
+          RaSidebarItem(label: 'Inbox', trailing: const Text('3'), selected: true, onPressed: () {}),
+        ]),
+        child: Column(children: [
+          RaPanelHeader(
+            leading: const RaPanelTitle('Inbox'),
+            trailing: RaIconButton(
+              label: 'Mark all as read',
+              shortcut: '⌘⇧A',
+              icon: RaIcon.glyph(RaGlyphs.check),
+              onPressed: () => RaToast.of(context).success('All caught up'),
+            ),
+          ),
+          Expanded(
+            child: Center(
+              child: RaButton(
+                variant: RaButtonVariant.danger,
+                onPressed: () => showRaConfirmDialog(
+                  context: context,
+                  title: 'Delete project?',
+                  description: const Text('This cannot be undone.'),
+                  confirmLabel: 'Delete',
+                  tone: RaConfirmTone.danger,
+                  onConfirm: () async {/* call your API */},
+                ),
+                child: const Text('Delete project'),
+              ),
+            ),
+          ),
+        ]),
+      ),
+    );
+  }
+}
+```
+
+### Run the gallery
+
+```sh
+git clone https://github.com/orra-bot/orra_ui && cd orra_ui
+flutter pub get
+cd example && flutter run -d macos   # or -d windows / -d linux / -d chrome
+```
+
+## Components
+
+| Component | Notes |
 | --- | --- |
-| Base UI | widgets 层的 Raw* 组件，外观与交互由 orra_ui 自己实现 |
-| CSS 变量三层 | Dart 常量（基础层）+ `RaColors` / `RaTypography` 等（语义层，浅 / 深各一套）+ `Ra*ThemeData`（组件层，由语义层推导、可覆盖） |
-| ESLint + tokens.test.ts | `orra_guardrails`（analyzer 语法树），在 `flutter test` 中执行 |
-| Playwright E2E 几何断言 | widget 测试（`tester.getRect` 等） |
-| Electron `trafficLightPosition` | `orra_desktop_shell` 自带的 macOS 原生插件，在缩放、全屏切换后会重新定位 |
-| Windows `titleBarOverlay` | Flutter 自绘的最小化 / 最大化 / 关闭按钮（`RaWindowCaptionButtons`） |
-| CSS 过渡 | `RaPressable` 按状态变化给出时长：悬停出现 0、移开 150ms、按下 100ms。颜色按预乘 alpha 插值，与 CSS 一致。 |
-| 0.5px 细线 | 按设备像素比取整：2 倍屏为 1 物理像素，1 倍屏为 1px |
-| Nucleo 付费图标 | 不绑定图标库，默认内置 Lucide 同款几何 |
+| `RaButton` | Variants: `primary`, `secondary`, `ghost`, `quiet`, `danger`, `dangerSolid`, `card`, `item`, `chip`, `send`, `icon`. Sizes 28 / 32 / 40. With `loading`, the button shows a spinner and stays focusable. |
+| `RaIconButton` | 28 px round button with a required `label`, used as both the tooltip and the accessible name. Optional shortcut hint. |
+| `RaTooltip` | White bubble, 0.5 px border, 11 px text, 600 ms delay. Replaces native `title`. |
+| `RaTextField` / `RaForm` | Label, description, and error. The focus border uses the accent color (no focus ring). Validation starts after blur, then runs live. Search style and multiline. |
+| `RaMenu` / `RaContextMenu` | Matches Linear's menus: radius 12, 32 px rows, 14 px text inset, 6 px highlight inset. Submenus, radio items, headers, full-width separators. Keyboard: ↑ ↓ ← → Enter Esc. |
+| `RaMenuTrigger` | Pill, chip, and full-row trigger styles. |
+| `RaDialog` / `showRaDialog` / `showRaConfirmDialog` | Width is `min(460, window − 32)`. The confirm dialog handles pending and error states and replaces `confirm()`. |
+| `RaToast` | Bottom-right, 5 s auto-dismiss that pauses on hover. At most 3 at a time. |
+| `RaSidebarSection` / `RaSidebarItem` / `RaStatusDot` | 28 px rows. Hover, selected, and pressed states use translucent overlays only. |
+| `RaScrollbar`, `RaSeparator`, `RaAvatar`, `RaSpinner`, `RaSidebarIcon` | Supporting pieces. |
 
-## 第一期范围
+Lower-level building blocks are public too: `RaPressable` (hover, press, and focus states with CSS-like transition timing), `RaAnimatedSurface`, `RaPopoverPositioner`, `RaHairline`.
 
-已完成：
+## Window shell
 
-- 设计变量三层
-- 主题与扩展
-- 组件：Button / IconButton / Tooltip / TextField + Form / Menu（子菜单、单选、右键菜单、触发器）/ Dialog + 确认框 / Toast / 侧栏组件 / 滚动条
-- 窗口外壳：无标题栏、侧栏开合、内容面板、面板顶栏与面包屑、窗口按钮、窗口状态记忆、原生菜单栏与快捷键
-- 守护规则
-- 展示应用
+```
+┌───────────────────────── title bar · 44 px · draggable ─────────────────────────┐
+│ ● ● ●   [⊟]          [‹][›] │ [tabs / custom content]               [—][□][×] │  ← 22 px centerline
+├──────────────────────────────┬───────────────────────────────────────────────────┤
+│ sidebar · 238 px             │ ╭─ content panel · radius 12 · 0.5 px border ─╮ │
+│ (solid chrome background)    │ │ RaPanelHeader · 44 px · draggable            │ │
+│                              │ │                                              │ │
+│ RaSidebarSection             │ │ your view                                    │ │
+│   RaSidebarItem              │ │                                              │ │
+│                              │ ╰──────────────────────────────────────────────╯ │
+└──────────────────────────────┴──────────────── 8 px from window edges ─────────┘
+```
 
-后续可做：
+- **Sidebar.** Animates 238 ↔ 8 px over 300 ms with `cubic-bezier(0.22, 1, 0.36, 1)`, easing out in both directions and reversible mid-flight. The content is clipped, not reflowed. Once collapsed it is hidden from pointer, focus, and screen readers.
+- **macOS.** Traffic lights are re-centered on the 44 px title bar by the bundled native plugin, which re-applies the layout after resize and full screen.
+- **Windows / Linux.** Minimize, maximize, and close buttons are drawn by the shell. Hovering close turns it system red.
+- **Web.** The layout is the same. There are no traffic lights or caption buttons, so the controls start 12 px from the left. Dragging and double-clicking the title bar do nothing. `RaShellPlatform.current` tells you which host you are on.
+- **Drag regions.** `RaWindowDragArea` moves the window from empty space and maximizes on double-click. Interactive widgets opt out automatically, so a drag that starts on a button never moves the window.
+- **Window state.** Bounds are debounced to disk and validated against connected displays on restore. Unplugging an external monitor never strands the window off-screen.
+- **Menu bar.** `RaAppMenuBar` builds a native macOS menu bar. On Windows, Linux, and the web the same shortcuts work globally. Use `raPrimaryShortcut` for ⌘ / Ctrl; on the web it follows the user's OS. In the browser, handled shortcuts suppress the browser's default action (for example ⌘[ for Back), but shortcuts the browser reserves, such as ⌘W, ⌘T, and ⌘N, never reach the page.
+- **Context menus on the web.** While the pointer is over a `RaContextMenu`, the browser's own context menu is disabled so it does not cover yours. Everywhere else, including text fields, the browser menu still works.
 
-- 标签栏（Chrome 式）
-- 命令面板 ⌘K
-- Tabs / SegmentedControl / SideCard
-- Composer / Chat / Markdown
-- 设置页版式
-- 主题编辑器（OKLCH 推导）
-- Windows / Linux 的原生编译验证（需要在对应系统上构建）
+## Theming
+
+```dart
+// 1. Brand color: override only the semantic accent family.
+final light = RaThemeData.light(
+  colors: const RaColors.light(
+    accent: Color(0xFF0E7C66),
+    accentHover: Color(0xFF0B6655),
+    accentSoft: Color(0xFFE2F4F0),
+    accentInk: Color(0xFF0B6655),
+  ),
+);
+
+// 2. One component: start from the derived theme and tweak a variant.
+final base = RaThemeData.light();
+final pillButtons = base.copyWith(
+  button: base.button.withVariant(
+    RaButtonVariant.primary,
+    RaButtonStyle(radius: base.radii.pill),
+  ),
+);
+
+// 3. One instance.
+RaButton(style: const RaButtonStyle(/* ... */), onPressed: save, child: const Text('Save'));
+
+RaApp(theme: light, darkTheme: RaThemeData.dark(/* ... */), themeMode: RaThemeMode.system, home: ...);
+```
+
+| Layer | Where | Rules |
+| --- | --- | --- |
+| **Primitive** | `RaPalette`, `RaSizes`, `RaFontScale`, `RaDurations`, `RaCurves` | The only place literals live. |
+| **Semantic** | `RaColors` (light / dark), `RaTypography`, `RaSpacing`, `RaRadii`, `RaSizing`, `RaShadows`, `RaMotion` | References primitives only. Dark mode is defined here and nowhere else. |
+| **Component** | `RaButtonThemeData`, `RaMenuThemeData`, `RaFieldThemeData`, … plus your own `RaThemeExtension`s | Derived from semantic tokens by default and recomputed when you change them, unless you override them. |
+
+Changing a semantic token re-derives every component theme you have not explicitly overridden. Apps add their own tokens through `RaThemeExtension`: see `RaShellThemeData` and [`example/lib/gallery_layout.dart`](example/lib/gallery_layout.dart).
+
+## Icons
+
+orra_ui is not tied to any icon library.
+
+- **Internal icons.** Checkmarks, chevrons, close, search, and the window caption glyphs live in `RaIconSet` (`theme.icons`). They default to built-in vector glyphs that match Lucide's geometry, and each one can be swapped:
+
+  ```dart
+  base.copyWith(icons: base.icons.copyWith(check: const RaGlyph.icon(MyIcons.check)));
+  ```
+
+- **Your own content.** Use any `IconData` with `RaIcon(LucideIcons.inbox)`, or any widget through `RaGlyph.builder`. Icons render at 14 px in a 16 px slot and inherit the component's foreground color.
+
+## Guardrails
+
+Conventions only hold if something enforces them. `orra_guardrails` parses your sources with the Dart analyzer and runs inside `flutter test`:
+
+```dart
+test('app follows the token layers', () {
+  final violations = runGuardrails(GuardrailConfig(
+    root: Directory.current.path,
+    targets: const [
+      GuardrailTarget(GuardrailLayer.primitive, ['lib/theme/palette.dart']),
+      GuardrailTarget(GuardrailLayer.semantic, ['lib/theme/brand.dart']),
+      GuardrailTarget(GuardrailLayer.componentTokens, ['lib/theme/layout.dart']),
+      GuardrailTarget(GuardrailLayer.app, ['lib']),
+    ],
+  ));
+  expect(violations, isEmpty, reason: violations.join('\n'));
+});
+```
+
+It flags:
+
+- Color, duration, curve, and font-weight literals outside primitives.
+- Numbers in the semantic layer.
+- Hard-coded sizes in component code.
+- Direct references to primitives from components.
+- Brightness checks in components.
+- Unused primitives.
+- Imports of `material.dart` or `cupertino.dart`.
+- Raw widgets (`EditableText`, `RawMenuAnchor`, `RawTooltip`, `showGeneralDialog`, …) used from app code.
+
+## Testing
+
+Layout is verified by measuring geometry, not by comparing screenshots. Examples from the suite:
+
+- Window controls center on y = 22, and the panel's top edge sits at y = 44.
+- The panel is inset 8 px from the window's right and bottom edges.
+- The sidebar collapse is sampled frame by frame:
+  - monotonic, with intermediate frames;
+  - more than 3× faster in the first half than in the second (ease-out);
+  - continuous when reversed mid-flight;
+  - instant under reduced motion.
+- Every sidebar fill in every state, in light and dark mode, is translucent.
+- Menu rows are 32 px, text starts 14 px from the edge, and the highlight is inset 6 px.
+- The dialog is 460 px wide, or `window − 32` on narrow windows.
+- The native macOS window color and the colors in `web/index.html` equal the theme's chrome color, so there is no flash on the first frame.
+- On the web, the frame has no caption buttons, the window plugins are never called, and ⌘ is used in a Mac browser. These run in the VM with `debugRaIsWebOverride`, and again in a real browser.
+
+```sh
+# in packages/orra_ui, packages/orra_desktop_shell, example
+flutter analyze && flutter test
+# in packages/orra_guardrails
+dart analyze && dart test
+
+# the same suites compiled for the web, in headless Chrome
+cd packages/orra_ui && flutter test --platform chrome
+cd example && flutter test --platform chrome
+cd packages/orra_desktop_shell && flutter test --platform chrome test/web_test.dart test/page_style_browser_test.dart
+```
+
+## Platform support
+
+| | macOS | Windows | Linux | Web |
+| --- | :---: | :---: | :---: | :---: |
+| Components | ✅ | ✅ | ✅ | ✅ |
+| Frameless window and shell | ✅ native traffic lights | ✅ drawn caption buttons | ✅ drawn caption buttons | ✅ same layout, no window buttons |
+| Native menu bar | ✅ | — (shortcuts only) | — (shortcuts only) | — (shortcuts only) |
+| Remembered window bounds | ✅ | ✅ | ✅ | — (the browser decides) |
+| Build verified | ✅ | ⏳ | ⏳ | ✅ JavaScript and Wasm |
+
+⏳ means the Dart code is covered by tests on every platform, but the native runner has not yet been built in CI.
+
+## Roadmap
+
+- [x] Design tokens, theming, and extensions
+- [x] Button, IconButton, Tooltip, TextField / Form, Menu, Dialog, Toast, sidebar widgets
+- [x] Window shell, window state, menu bar, and shortcuts
+- [x] Guardrails and the gallery app
+- [x] Web support (same widgets and shell in the browser)
+- [ ] Chrome-style tab strip (per-tab history, drag to reorder, reopen closed tab)
+- [ ] Command palette (⌘K)
+- [ ] Tabs, SegmentedControl, SideCard / PropertyRow, Drawer
+- [ ] Composer, chat log, Markdown
+- [ ] Settings page layout
+- [ ] Theme editor (OKLCH-derived custom themes)
+- [ ] CI for macOS, Windows, Linux, and web builds
+- [ ] Publish to pub.dev
+
+## Contributing
+
+Issues and pull requests are welcome. A few house rules keep the system coherent:
+
+1. **Compose before you add.** New components should be discussed in an issue first. Page layouts belong in apps, not in `orra_ui`.
+2. **No literals outside primitives.** Add a semantic token when the purpose is shared, or a component token when it isn't. Dark-mode values go in the semantic layer only.
+3. **Translucent fills on chrome.** Hover, selected, and pressed states on the sidebar and title bar use overlay colors, never solid fills.
+4. **No focus rings.** This is a deliberate product decision. Focused inputs show it by changing their border color instead.
+5. **Prove it with tests.** Assert geometry and state. Run `flutter analyze` and `flutter test` in every package before opening a PR.
+
+## Acknowledgements
+
+- Visual language inspired by [Linear](https://linear.app); window structure informed by Cursor and the ChatGPT desktop app.
+- [Inter](https://rsms.me/inter/) by Rasmus Andersson (SIL OFL 1.1), bundled.
+- Built-in glyph geometry from [Lucide](https://lucide.dev) (ISC).
+- Window management by [window_manager](https://pub.dev/packages/window_manager).
+
+See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for the full license texts.
+
+## License
+
+[MIT](LICENSE) © 2026 orra-bot and contributors

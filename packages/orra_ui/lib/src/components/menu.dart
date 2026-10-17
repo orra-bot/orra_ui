@@ -4,6 +4,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
+import '../foundation/browser.dart';
 import '../foundation/hairline.dart';
 import '../foundation/motion.dart';
 import '../foundation/popover_layout.dart';
@@ -108,12 +109,15 @@ class RaContextMenu extends StatelessWidget {
             state._controller.close();
           }
         },
-        child: GestureDetector(
-          behavior: HitTestBehavior.translucent,
-          onSecondaryTapUp: enabled
-              ? (TapUpDetails d) => state._controller.open(position: d.localPosition)
-              : null,
-          child: child,
+        child: RaBrowserContextMenuGuard(
+          enabled: enabled,
+          child: GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            onSecondaryTapUp: enabled
+                ? (TapUpDetails d) => state._controller.open(position: d.localPosition)
+                : null,
+            child: child,
+          ),
         ),
       ),
     );

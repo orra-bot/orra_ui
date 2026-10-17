@@ -1,6 +1,7 @@
 name: orra_guardrails
-description: orra_ui 的守护规则：设计变量三层约束与禁用原生控件检查（在单元测试中运行）。
+description: "Static checks for orra_ui codebases: design-token layering and banned raw widgets, run from unit tests."
 version: 0.1.0
+repository: https://github.com/orra-bot/orra_ui
 publish_to: none
 resolution: workspace
 

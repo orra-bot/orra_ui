@@ -4,6 +4,8 @@
 import 'package:flutter/widgets.dart';
 import 'package:orra_ui/orra_ui.dart';
 
+import 'shell_platform.dart';
+
 /// 窗口外壳几何与颜色（Linear 桌面版实测）：
 /// 标题栏 44（红绿灯、窗口按钮组、标签栏共用 22px 中线）、侧栏 238、内容面板距窗口 8、圆角 12、面板顶栏 44。
 @immutable
@@ -108,7 +110,7 @@ class RaShellThemeData extends RaThemeExtension {
   /// 侧栏内边距：首行中线与面板顶栏中线对齐（8 + 14 ≈ 0.5 + 22）。
   final EdgeInsets sidebarPadding;
 
-  /// 窗口按钮组左缘（Windows / Linux）。
+  /// 窗口按钮组左缘（Windows / Linux / 网页）。
   final double controlsLeft;
 
   /// 窗口按钮组左缘（macOS：红绿灯右缘 72 + 12）。
@@ -148,9 +150,9 @@ class RaShellThemeData extends RaThemeExtension {
   final Color closeHoverColor;
   final Color onCloseHoverColor;
 
-  /// 当前平台的窗口按钮组左缘。
-  double controlsLeftFor(TargetPlatform platform) =>
-      platform == TargetPlatform.macOS ? controlsLeftMac : controlsLeft;
+  /// 当前宿主的窗口按钮组左缘（macOS 让出红绿灯）。
+  double controlsLeftFor(RaShellPlatform platform) =>
+      platform.hasTrafficLights ? controlsLeftMac : controlsLeft;
 
   RaShellThemeData copyWith({
     double? titlebarHeight,

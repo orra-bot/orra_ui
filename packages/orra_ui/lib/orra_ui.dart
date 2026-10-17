@@ -1,4 +1,4 @@
-/// orra_ui：面向 Flutter 桌面端的可配置设计系统与组件库。
+/// orra_ui：面向 Flutter 桌面端与网页端的可配置设计系统与组件库。
 ///
 /// 默认主题对照 Linear；只依赖 widgets 层（不引入 Material / Cupertino）。
 library;
@@ -14,6 +14,7 @@ export 'src/components/text_field.dart';
 export 'src/components/toast.dart';
 export 'src/components/tooltip.dart';
 export 'src/foundation/app.dart';
+export 'src/foundation/browser.dart';
 export 'src/foundation/color_tween.dart';
 export 'src/foundation/hairline.dart';
 export 'src/foundation/localizations.dart';

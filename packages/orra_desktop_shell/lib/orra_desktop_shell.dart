@@ -1,5 +1,5 @@
 /// orra_ui 的桌面窗口外壳：无标题栏窗口（实色窗口底 + 圆角内容面板 + 侧栏）、
-/// 窗口按钮、窗口状态记忆、原生菜单栏与快捷键。
+/// 窗口按钮、窗口状态记忆、原生菜单栏与快捷键。同一套框架可运行在网页端（见 [RaShellPlatform]）。
 library;
 
 export 'src/caption_buttons.dart';
@@ -7,6 +7,7 @@ export 'src/commands.dart';
 export 'src/desktop_window.dart';
 export 'src/drag_area.dart';
 export 'src/frame.dart';
+export 'src/shell_platform.dart';
 export 'src/shell_strings.dart';
 export 'src/shell_theme.dart';
 export 'src/window_controller.dart';
