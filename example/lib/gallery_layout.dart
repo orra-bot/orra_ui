@@ -22,6 +22,7 @@ class GalleryLayout extends RaThemeExtension {
     required this.fieldColumnWidth,
     required this.contextAreaHeight,
     required this.demoSidebarWidth,
+    required this.sideCardWidth,
   });
 
   factory GalleryLayout.fallback(RaThemeData theme) => GalleryLayout(
@@ -41,6 +42,7 @@ class GalleryLayout extends RaThemeExtension {
     fieldColumnWidth: 360,
     contextAreaHeight: 96,
     demoSidebarWidth: 238,
+    sideCardWidth: 304,
   );
 
   static GalleryLayout of(BuildContext context) =>
@@ -62,4 +64,7 @@ class GalleryLayout extends RaThemeExtension {
   final double fieldColumnWidth;
   final double contextAreaHeight;
   final double demoSidebarWidth;
+
+  /// 右侧栏卡片宽（右侧栏 320 − 右缘 8 − 左缘 8）。
+  final double sideCardWidth;
 }

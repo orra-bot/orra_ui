@@ -28,7 +28,7 @@ class _ButtonsPageState extends State<ButtonsPage> {
     final RaThemeData theme = RaTheme.of(context);
     return GalleryPage(
       title: '按钮',
-      description: '悬停底色立即出现、移开 150ms 淡出；按下 100ms。全局不显示焦点环，键盘 Tab / Enter / Space 仍可用。',
+      description: '悬停底色立即出现、移开 75ms 淡出；按下 50ms。全局不显示焦点环，键盘 Tab / Enter / Space 仍可用。',
       sections: <GallerySection>[
         GallerySection(
           title: '变体',

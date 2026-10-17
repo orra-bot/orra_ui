@@ -50,6 +50,22 @@ class RaThemeData {
     RaToastThemeData? toast,
     RaSidebarThemeData? sidebar,
     RaScrollbarThemeData? scrollbar,
+    RaTabsThemeData? tabs,
+    RaSegmentedControlThemeData? segmentedControl,
+    RaTagThemeData? tag,
+    RaSideCardThemeData? sideCard,
+    RaStateBlockThemeData? stateBlock,
+    RaDrawerThemeData? drawer,
+    RaControlThemeData? control,
+    RaSelectThemeData? select,
+    RaPopoverThemeData? popover,
+    RaComboboxThemeData? combobox,
+    RaSliderThemeData? slider,
+    RaProgressThemeData? progress,
+    RaNumberFieldThemeData? numberField,
+    RaToolbarThemeData? toolbar,
+    RaAccordionThemeData? accordion,
+    RaFieldsetThemeData? fieldset,
     Iterable<RaThemeExtension> extensions = const <RaThemeExtension>[],
   }) {
     final bool dark = brightness == Brightness.dark;
@@ -77,6 +93,22 @@ class RaThemeData {
         toast: toast,
         sidebar: sidebar,
         scrollbar: scrollbar,
+        tabs: tabs,
+        segmentedControl: segmentedControl,
+        tag: tag,
+        sideCard: sideCard,
+        stateBlock: stateBlock,
+        drawer: drawer,
+        control: control,
+        select: select,
+        popover: popover,
+        combobox: combobox,
+        slider: slider,
+        progress: progress,
+        numberField: numberField,
+        toolbar: toolbar,
+        accordion: accordion,
+        fieldset: fieldset,
       ),
       extensions: <Object, RaThemeExtension>{
         for (final RaThemeExtension e in extensions) e.type: e,
@@ -100,7 +132,24 @@ class RaThemeData {
        dialog = overrides.dialog ?? RaDialogThemeData.fallback(tokens),
        toast = overrides.toast ?? RaToastThemeData.fallback(tokens),
        sidebar = overrides.sidebar ?? RaSidebarThemeData.fallback(tokens),
-       scrollbar = overrides.scrollbar ?? RaScrollbarThemeData.fallback(tokens);
+       scrollbar = overrides.scrollbar ?? RaScrollbarThemeData.fallback(tokens),
+       tabs = overrides.tabs ?? RaTabsThemeData.fallback(tokens),
+       segmentedControl =
+           overrides.segmentedControl ?? RaSegmentedControlThemeData.fallback(tokens),
+       tag = overrides.tag ?? RaTagThemeData.fallback(tokens),
+       sideCard = overrides.sideCard ?? RaSideCardThemeData.fallback(tokens),
+       stateBlock = overrides.stateBlock ?? RaStateBlockThemeData.fallback(tokens),
+       drawer = overrides.drawer ?? RaDrawerThemeData.fallback(tokens),
+       control = overrides.control ?? RaControlThemeData.fallback(tokens),
+       select = overrides.select ?? RaSelectThemeData.fallback(tokens),
+       popover = overrides.popover ?? RaPopoverThemeData.fallback(tokens),
+       combobox = overrides.combobox ?? RaComboboxThemeData.fallback(tokens),
+       slider = overrides.slider ?? RaSliderThemeData.fallback(tokens),
+       progress = overrides.progress ?? RaProgressThemeData.fallback(tokens),
+       numberField = overrides.numberField ?? RaNumberFieldThemeData.fallback(tokens),
+       toolbar = overrides.toolbar ?? RaToolbarThemeData.fallback(tokens),
+       accordion = overrides.accordion ?? RaAccordionThemeData.fallback(tokens),
+       fieldset = overrides.fieldset ?? RaFieldsetThemeData.fallback(tokens);
 
   /// 默认浅色主题（Linear 风格）。
   factory RaThemeData.light({
@@ -160,6 +209,22 @@ class RaThemeData {
   final RaToastThemeData toast;
   final RaSidebarThemeData sidebar;
   final RaScrollbarThemeData scrollbar;
+  final RaTabsThemeData tabs;
+  final RaSegmentedControlThemeData segmentedControl;
+  final RaTagThemeData tag;
+  final RaSideCardThemeData sideCard;
+  final RaStateBlockThemeData stateBlock;
+  final RaDrawerThemeData drawer;
+  final RaControlThemeData control;
+  final RaSelectThemeData select;
+  final RaPopoverThemeData popover;
+  final RaComboboxThemeData combobox;
+  final RaSliderThemeData slider;
+  final RaProgressThemeData progress;
+  final RaNumberFieldThemeData numberField;
+  final RaToolbarThemeData toolbar;
+  final RaAccordionThemeData accordion;
+  final RaFieldsetThemeData fieldset;
 
   /// 读取扩展；没有登记时用 [fallback] 从当前主题推导。
   T extension<T extends RaThemeExtension>(RaThemeExtensionFactory<T> fallback) {
@@ -188,6 +253,22 @@ class RaThemeData {
     RaToastThemeData? toast,
     RaSidebarThemeData? sidebar,
     RaScrollbarThemeData? scrollbar,
+    RaTabsThemeData? tabs,
+    RaSegmentedControlThemeData? segmentedControl,
+    RaTagThemeData? tag,
+    RaSideCardThemeData? sideCard,
+    RaStateBlockThemeData? stateBlock,
+    RaDrawerThemeData? drawer,
+    RaControlThemeData? control,
+    RaSelectThemeData? select,
+    RaPopoverThemeData? popover,
+    RaComboboxThemeData? combobox,
+    RaSliderThemeData? slider,
+    RaProgressThemeData? progress,
+    RaNumberFieldThemeData? numberField,
+    RaToolbarThemeData? toolbar,
+    RaAccordionThemeData? accordion,
+    RaFieldsetThemeData? fieldset,
     Iterable<RaThemeExtension>? extensions,
   }) {
     return RaThemeData(
@@ -210,6 +291,22 @@ class RaThemeData {
       toast: toast ?? _overrides.toast,
       sidebar: sidebar ?? _overrides.sidebar,
       scrollbar: scrollbar ?? _overrides.scrollbar,
+      tabs: tabs ?? _overrides.tabs,
+      segmentedControl: segmentedControl ?? _overrides.segmentedControl,
+      tag: tag ?? _overrides.tag,
+      sideCard: sideCard ?? _overrides.sideCard,
+      stateBlock: stateBlock ?? _overrides.stateBlock,
+      drawer: drawer ?? _overrides.drawer,
+      control: control ?? _overrides.control,
+      select: select ?? _overrides.select,
+      popover: popover ?? _overrides.popover,
+      combobox: combobox ?? _overrides.combobox,
+      slider: slider ?? _overrides.slider,
+      progress: progress ?? _overrides.progress,
+      numberField: numberField ?? _overrides.numberField,
+      toolbar: toolbar ?? _overrides.toolbar,
+      accordion: accordion ?? _overrides.accordion,
+      fieldset: fieldset ?? _overrides.fieldset,
       extensions: extensions ?? _extensions.values,
     );
   }
@@ -227,6 +324,22 @@ class _ComponentOverrides {
     this.toast,
     this.sidebar,
     this.scrollbar,
+    this.tabs,
+    this.segmentedControl,
+    this.tag,
+    this.sideCard,
+    this.stateBlock,
+    this.drawer,
+    this.control,
+    this.select,
+    this.popover,
+    this.combobox,
+    this.slider,
+    this.progress,
+    this.numberField,
+    this.toolbar,
+    this.accordion,
+    this.fieldset,
   });
 
   final RaChromeThemeData? chrome;
@@ -238,4 +351,20 @@ class _ComponentOverrides {
   final RaToastThemeData? toast;
   final RaSidebarThemeData? sidebar;
   final RaScrollbarThemeData? scrollbar;
+  final RaTabsThemeData? tabs;
+  final RaSegmentedControlThemeData? segmentedControl;
+  final RaTagThemeData? tag;
+  final RaSideCardThemeData? sideCard;
+  final RaStateBlockThemeData? stateBlock;
+  final RaDrawerThemeData? drawer;
+  final RaControlThemeData? control;
+  final RaSelectThemeData? select;
+  final RaPopoverThemeData? popover;
+  final RaComboboxThemeData? combobox;
+  final RaSliderThemeData? slider;
+  final RaProgressThemeData? progress;
+  final RaNumberFieldThemeData? numberField;
+  final RaToolbarThemeData? toolbar;
+  final RaAccordionThemeData? accordion;
+  final RaFieldsetThemeData? fieldset;
 }

@@ -260,6 +260,49 @@ void main() {
     expect(below, 1);
   });
 
+  testWidgets('chip / row triggers are transparent at rest; plain pill has room on both sides', (
+    WidgetTester tester,
+  ) async {
+    await pumpRa(
+      tester,
+      Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          RaMenu(
+            items: const <Widget>[],
+            child: const RaMenuTrigger(child: Text('排序')),
+          ),
+          RaMenu(
+            items: const <Widget>[],
+            child: const RaMenuTrigger(variant: RaMenuTriggerVariant.chip, child: Text('交给')),
+          ),
+          SizedBox(
+            width: 214,
+            child: RaMenu(
+              items: const <Widget>[],
+              child: const RaMenuTrigger(
+                variant: RaMenuTriggerVariant.row,
+                child: Text('Workspace'),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+    RaAnimatedSurface surface(String text) => tester.widget<RaAnimatedSurface>(
+      find.ancestor(of: find.text(text), matching: find.byType(RaAnimatedSurface)).first,
+    );
+    for (final String text in <String>['交给', 'Workspace']) {
+      expect(surface(text).backgroundColor, isNull, reason: text);
+      expect(surface(text).borderColor, isNull, reason: text);
+      expect(surface(text).shadows, isNull, reason: text);
+    }
+    final Rect pill = tester.getRect(find.byType(RaMenuTrigger).first);
+    expect(tester.getTopLeft(find.text('排序')).dx - pill.left, 12);
+    expect(pill.right - tester.getTopRight(find.text('排序')).dx, 10);
+  });
+
   testWidgets('trigger toggles the menu', (WidgetTester tester) async {
     await pumpRa(tester, menu());
     await tester.tap(find.text('Open'));

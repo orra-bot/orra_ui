@@ -21,6 +21,7 @@ class RaColors with Diagnosticable {
     required this.surfaceRaised,
     required this.sunken,
     required this.hover,
+    required this.surfaceHover,
     required this.surfaceWindow,
     required this.surfaceCanvas,
     required this.surfaceInverse,
@@ -77,6 +78,7 @@ class RaColors with Diagnosticable {
     this.surfaceRaised = RaPalette.gray25,
     this.sunken = RaPalette.gray50,
     this.hover = RaPalette.blackA6,
+    this.surfaceHover = RaPalette.gray10,
     this.surfaceWindow = RaPalette.gray50,
     this.surfaceCanvas = RaPalette.gray25,
     this.surfaceInverse = RaPalette.gray900,
@@ -133,6 +135,7 @@ class RaColors with Diagnosticable {
     this.surfaceRaised = RaPalette.gray875,
     this.sunken = RaPalette.gray875,
     this.hover = RaPalette.whiteA6,
+    this.surfaceHover = RaPalette.gray875,
     this.surfaceWindow = RaPalette.gray975,
     this.surfaceCanvas = RaPalette.gray950,
     this.surfaceInverse = RaPalette.gray10,
@@ -196,6 +199,9 @@ class RaColors with Diagnosticable {
 
   /// 浅色表面上的悬停
   final Color hover;
+
+  /// 白底表面（次要按钮、选择框、胶囊触发器）的悬停底色：不透明、比 [hover] 浅。
+  final Color surfaceHover;
 
   /// 窗口底（侧栏与内容面板四周）
   final Color surfaceWindow;
@@ -344,6 +350,7 @@ class RaColors with Diagnosticable {
     Color? surfaceRaised,
     Color? sunken,
     Color? hover,
+    Color? surfaceHover,
     Color? surfaceWindow,
     Color? surfaceCanvas,
     Color? surfaceInverse,
@@ -398,6 +405,7 @@ class RaColors with Diagnosticable {
       surfaceRaised: surfaceRaised ?? this.surfaceRaised,
       sunken: sunken ?? this.sunken,
       hover: hover ?? this.hover,
+      surfaceHover: surfaceHover ?? this.surfaceHover,
       surfaceWindow: surfaceWindow ?? this.surfaceWindow,
       surfaceCanvas: surfaceCanvas ?? this.surfaceCanvas,
       surfaceInverse: surfaceInverse ?? this.surfaceInverse,
@@ -457,6 +465,7 @@ class RaColors with Diagnosticable {
       surfaceRaised: Color.lerp(a.surfaceRaised, b.surfaceRaised, t)!,
       sunken: Color.lerp(a.sunken, b.sunken, t)!,
       hover: Color.lerp(a.hover, b.hover, t)!,
+      surfaceHover: Color.lerp(a.surfaceHover, b.surfaceHover, t)!,
       surfaceWindow: Color.lerp(a.surfaceWindow, b.surfaceWindow, t)!,
       surfaceCanvas: Color.lerp(a.surfaceCanvas, b.surfaceCanvas, t)!,
       surfaceInverse: Color.lerp(a.surfaceInverse, b.surfaceInverse, t)!,
@@ -513,6 +522,7 @@ class RaColors with Diagnosticable {
     surfaceRaised,
     sunken,
     hover,
+    surfaceHover,
     surfaceWindow,
     surfaceCanvas,
     surfaceInverse,
@@ -579,6 +589,7 @@ class RaColors with Diagnosticable {
     properties.add(ColorProperty('surfaceRaised', surfaceRaised));
     properties.add(ColorProperty('sunken', sunken));
     properties.add(ColorProperty('hover', hover));
+    properties.add(ColorProperty('surfaceHover', surfaceHover));
     properties.add(ColorProperty('surfaceWindow', surfaceWindow));
     properties.add(ColorProperty('surfaceCanvas', surfaceCanvas));
     properties.add(ColorProperty('surfaceInverse', surfaceInverse));

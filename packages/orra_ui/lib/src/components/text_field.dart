@@ -46,6 +46,8 @@ class RaTextField extends StatefulWidget {
     this.textInputAction,
     this.inputFormatters,
     this.autofillHints,
+    this.trailing,
+    this.textAlign = TextAlign.start,
   });
 
   /// 标签文字；同时作为无障碍名称。
@@ -82,6 +84,10 @@ class RaTextField extends StatefulWidget {
   final TextInputAction? textInputAction;
   final List<TextInputFormatter>? inputFormatters;
   final Iterable<String>? autofillHints;
+
+  /// 输入框内右侧的控件（如数字输入框的 − / +、选择框的箭头）；只用于单行。
+  final Widget? trailing;
+  final TextAlign textAlign;
 
   @override
   State<RaTextField> createState() => RaTextFieldState();
@@ -231,6 +237,7 @@ class RaTextFieldState extends State<RaTextField>
       obscureText: widget.obscureText,
       autofocus: widget.autofocus,
       style: textStyle,
+      textAlign: widget.textAlign,
       strutStyle: StrutStyle.fromTextStyle(textStyle, forceStrutHeight: true),
       cursorColor: f.cursorColor,
       cursorWidth: f.cursorWidth,
@@ -280,9 +287,11 @@ class RaTextFieldState extends State<RaTextField>
     }
 
     final EdgeInsets padding = multiline ? f.multilinePadding : f.padding;
-    final EdgeInsets resolvedPadding = widget.search
+    final Widget? trailing = multiline ? null : widget.trailing;
+    EdgeInsets resolvedPadding = widget.search
         ? padding.copyWith(left: f.searchPaddingLeft)
         : padding;
+    if (trailing != null) resolvedPadding = resolvedPadding.copyWith(right: f.trailingPaddingRight);
 
     Widget control = RaAnimatedSurface(
       duration: RaReducedMotion.resolve(context, theme.motion.fast),
@@ -296,13 +305,25 @@ class RaTextFieldState extends State<RaTextField>
           : BoxConstraints(minHeight: f.height, maxHeight: f.height),
       child: Padding(
         padding: resolvedPadding,
-        child: Align(
-          alignment: multiline ? Alignment.topLeft : Alignment.centerLeft,
-          heightFactor: multiline ? 1 : null,
-          child: _gestures.buildGestureDetector(
-            behavior: HitTestBehavior.translucent,
-            child: editable,
-          ),
+        child: Builder(
+          builder: (BuildContext context) {
+            final Widget field = Align(
+              alignment: multiline ? Alignment.topLeft : Alignment.centerLeft,
+              heightFactor: multiline ? 1 : null,
+              child: _gestures.buildGestureDetector(
+                behavior: HitTestBehavior.translucent,
+                child: editable,
+              ),
+            );
+            if (trailing == null) return field;
+            return Row(
+              spacing: f.trailingGap,
+              children: <Widget>[
+                Expanded(child: field),
+                trailing,
+              ],
+            );
+          },
         ),
       ),
     );

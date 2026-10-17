@@ -30,6 +30,7 @@ class RaButton extends StatelessWidget {
     this.onSecondaryTapUp,
     this.onMiddlePressed,
     this.expand = false,
+    this.hoverExitDuration,
   });
 
   /// 为空时禁用。
@@ -61,6 +62,9 @@ class RaButton extends StatelessWidget {
   /// 撑满可用宽度。
   final bool expand;
 
+  /// 悬停移开时的过渡时长（侧栏里的按钮直接消失）；为空时淡出 75ms。
+  final Duration? hoverExitDuration;
+
   @override
   Widget build(BuildContext context) {
     final RaThemeData theme = RaTheme.of(context);
@@ -77,6 +81,7 @@ class RaButton extends StatelessWidget {
       semanticLabel: semanticLabel,
       onSecondaryTapUp: onSecondaryTapUp,
       onMiddlePressed: onMiddlePressed,
+      hoverExitDuration: hoverExitDuration,
       builder: (BuildContext context, RaPressState state) {
         final Set<WidgetState> states = state.states;
         final Color? foreground = s.foregroundColor?.resolve(states);

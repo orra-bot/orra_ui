@@ -22,6 +22,30 @@ Future<BuildContext> _host(WidgetTester tester, {Size size = const Size(1280, 82
 void main() {
   final RaThemeData theme = RaThemeData.light();
 
+  testWidgets('dialog scales from 0.96 and fades in; closes the same way', (
+    WidgetTester tester,
+  ) async {
+    await pumpRa(
+      tester,
+      Builder(
+        builder: (BuildContext context) => RaButton(
+          onPressed: () => showRaDialog<void>(
+            context: context,
+            builder: (BuildContext context) => const RaDialog(title: '标题'),
+          ),
+          child: const Text('打开'),
+        ),
+      ),
+    );
+    await tester.tap(find.text('打开'));
+    await tester.pump();
+    final Finder scale = find.ancestor(of: find.text('标题'), matching: find.byType(ScaleTransition));
+    expect(tester.widget<ScaleTransition>(scale).scale.value, closeTo(0.96, 0.001));
+    await tester.pumpAndSettle();
+    expect(tester.widget<ScaleTransition>(scale).scale.value, 1);
+    expect(find.byType(FractionalTranslation), findsNothing);
+  });
+
   testWidgets('dialog is 460 wide, centered, with Linear surface', (WidgetTester tester) async {
     final BuildContext context = await _host(tester);
     unawaited(

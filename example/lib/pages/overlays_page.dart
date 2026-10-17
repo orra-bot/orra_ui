@@ -90,6 +90,59 @@ class _OverlaysPageState extends State<OverlaysPage> {
           ),
         ),
         GallerySection(
+          title: '弹出面板',
+          description: '点击打开，焦点移入面板；Esc 或点外部关闭，焦点回到触发按钮。',
+          child: DemoWrap(
+            children: <Widget>[
+              RaPopover(
+                title: '分享「客户反馈助手」',
+                description: const Text('拿到链接的 Workspace 成员都可以查看运行记录。'),
+                content: Builder(
+                  builder: (BuildContext context) => Align(
+                    alignment: AlignmentDirectional.centerEnd,
+                    child: RaButton(
+                      variant: RaButtonVariant.primary,
+                      size: RaButtonSize.sm,
+                      onPressed: () {
+                        RaPopover.of(context).close();
+                        RaToast.of(context).success('链接已拷贝');
+                      },
+                      child: const Text('拷贝链接'),
+                    ),
+                  ),
+                ),
+                child: Builder(
+                  builder: (BuildContext context) => RaButton(
+                    selected: RaPopover.of(context).isOpen,
+                    onPressed: RaPopover.of(context).toggle,
+                    child: const Text('分享'),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        GallerySection(
+          title: '悬停预览卡',
+          description: '悬停 600ms 后打开，指针可以移进卡片；离开 300ms 后关闭。键盘聚焦也会打开。',
+          child: DemoWrap(
+            children: <Widget>[
+              RaPreviewCard(
+                content: const RaPopoverPanel(
+                  title: 'Ive Tian',
+                  description: Text('产品负责人 · 上海'),
+                  child: Text('负责 3 个对象，最近一次运行在 3 分钟前。'),
+                ),
+                child: RaButton(
+                  variant: RaButtonVariant.ghost,
+                  onPressed: () {},
+                  child: const Text('@Ive Tian'),
+                ),
+              ),
+            ],
+          ),
+        ),
+        GallerySection(
           title: 'Toast',
           description: '右下角；5 秒后消失，悬停时暂停；成功 / 失败只靠图标颜色区分，最多同时 3 条。',
           child: DemoWrap(

@@ -14,6 +14,15 @@ class FieldsPage extends StatefulWidget {
 
 class _FieldsPageState extends State<FieldsPage> {
   final GlobalKey<RaFormState> _form = GlobalKey<RaFormState>();
+  String? _owner = 'ive';
+
+  static const List<RaComboboxOption<String>> _members = <RaComboboxOption<String>>[
+    RaComboboxOption<String>(value: 'ive', label: 'Ive Tian'),
+    RaComboboxOption<String>(value: 'ada', label: 'Ada Lovelace'),
+    RaComboboxOption<String>(value: 'alan', label: 'Alan Turing'),
+    RaComboboxOption<String>(value: 'grace', label: 'Grace Hopper'),
+    RaComboboxOption<String>(value: 'linus', label: 'Linus Torvalds', enabled: false),
+  ];
 
   void _submit() {
     if (_form.currentState!.validate()) {
@@ -80,6 +89,35 @@ class _FieldsPageState extends State<FieldsPage> {
                   RaTextField(label: '密码', obscureText: true, placeholder: '至少 8 位'),
                   RaTextField(label: '已禁用', enabled: false, initialValue: '不可编辑'),
                   RaTextField(label: '服务端错误', initialValue: 'taken-name', error: '名称已被占用'),
+                ],
+              ),
+            ),
+          ),
+        ),
+        GallerySection(
+          title: '可搜索的选择',
+          description:
+              '输入即过滤；↑ ↓ 移动、Enter 选中、Esc 收起，焦点始终留在输入框。'
+              '组合框只能选列表里的项（失焦时恢复为当前选中项）；自动补全允许自由输入。',
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: SizedBox(
+              width: layout.fieldColumnWidth,
+              child: RaForm(
+                children: <Widget>[
+                  RaCombobox<String>(
+                    label: '负责人',
+                    placeholder: '搜索成员',
+                    value: _owner,
+                    options: _members,
+                    onChanged: (String v) => setState(() => _owner = v),
+                  ),
+                  RaAutocomplete(
+                    label: '标签',
+                    placeholder: '输入或选择一个标签',
+                    suggestions: const <String>['客户反馈', '账单', '缺陷', '功能请求', '紧急'],
+                    onSelected: (String v) => RaToast.of(context).success('已选择「$v」'),
+                  ),
                 ],
               ),
             ),

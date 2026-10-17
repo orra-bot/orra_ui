@@ -53,7 +53,7 @@ orra_ui is built **only on Flutter's widgets layer**: no Material, no Cupertino.
   - Collapsible sidebar that is clipped, not reflowed, while it animates.
   - Remembered window bounds, a native macOS menu bar, and global shortcuts on every platform.
 - **Interaction details done right.**
-  - Hover appears instantly and fades out over 150 ms.
+  - Hover appears instantly and fades out over 75 ms.
   - Colors interpolate in premultiplied alpha, like CSS.
   - Menus grow from their trigger.
   - `prefers-reduced-motion` is respected everywhere.
@@ -240,9 +240,24 @@ cd example && flutter run -d macos   # or -d windows / -d linux / -d chrome
 | `RaDialog` / `showRaDialog` / `showRaConfirmDialog` | Width is `min(460, window − 32)`. The confirm dialog handles pending and error states and replaces `confirm()`. |
 | `RaToast` | Bottom-right, 5 s auto-dismiss that pauses on hover. At most 3 at a time. |
 | `RaSidebarSection` / `RaSidebarItem` / `RaStatusDot` | 28 px rows. Hover, selected, and pressed states use translucent overlays only. |
+| `RaCheckbox` / `RaRadioGroup` / `RaSwitch` | 14 px box and circle, 28 × 16 switch; checked uses the accent color. The whole row (label and description) is clickable. Checkbox supports a mixed state (`value: null`). |
+| `RaSelect` | Settings-page select: 30 px trigger, radius 8, small chevron; options open as a menu of radio items and close on pick. |
+| `RaTabs` | Horizontal or vertical page tabs: 32 px rows, translucent overlays only. Selects on press. `RaTabs.withPanels` adds a content area. |
+| `RaSegmentedControl` | Mode switcher (e.g. Chat \| Tune): sunken track, raised selected segment. |
+| `RaTag` / `RaCountTag` | 20 px status pills in seven tones (with optional dot; `outline` is dashed), and an unread count badge. |
+| `RaSideCard` / `RaPropertyRow` | Linear-style right-panel cards with a collapsible title and 90 px label column. |
+| `RaCollapsible` / `RaCollapsiblePanel` | Collapsible section; the panel animates its height and hides collapsed content from focus and screen readers. |
+| `RaLoadingState` / `RaEmptyState` / `RaErrorState` / `RaSkeleton` | Loading, empty (dashed), and error-with-retry blocks. |
+| `RaDrawer` / `showRaDrawer` | Panel that slides in from the right, `min(360, 92 % of the window)` wide. Replaces the right panel in narrow windows. |
+| `RaPopover` / `RaPopoverPanel` / `RaPreviewCard` | Anchored panel (focus moves in, Esc or outside click closes and returns focus) and a hover card that opens after 600 ms and stays open while the pointer is on it. |
+| `RaCombobox` / `RaAutocomplete` | Type to filter; ↑ ↓ Enter Esc while focus stays in the field. Combobox picks from the list; Autocomplete allows free text. |
+| `RaSlider` / `RaNumberField` | Keyboard steps (Shift for large steps, Home / End); number field has inline − / + and clamps on blur. |
+| `RaProgress` / `RaMeter` | 4 px bars with optional label and value; indeterminate progress; meter colors by threshold. |
+| `RaToggle` / `RaToggleGroup` / `RaToolbar` | Pressed-state buttons, single or multiple toggle groups, and a toolbar with arrow-key focus movement (not inside text fields). |
+| `RaAccordion` / `RaCheckboxGroup` / `RaFieldset` | Single- or multi-open accordion; checkbox group with a mixed-state parent; fieldset that can disable a whole group. |
 | `RaScrollbar`, `RaSeparator`, `RaAvatar`, `RaSpinner`, `RaSidebarIcon` | Supporting pieces. |
 
-Lower-level building blocks are public too: `RaPressable` (hover, press, and focus states with CSS-like transition timing), `RaAnimatedSurface`, `RaPopoverPositioner`, `RaHairline`.
+Lower-level building blocks are public too: `RaPressable` (hover, press, and focus states with CSS-like transition timing), `RaAnimatedSurface`, `RaPopoverPositioner`, `RaHairline`, `RaRovingGroup` (arrow-key navigation within a single-choice group), `RaDashedBorder`.
 
 ## Window shell
 
@@ -259,7 +274,7 @@ Lower-level building blocks are public too: `RaPressable` (hover, press, and foc
 └──────────────────────────────┴──────────────── 8 px from window edges ─────────┘
 ```
 
-- **Sidebar.** Animates 238 ↔ 8 px over 300 ms with `cubic-bezier(0.22, 1, 0.36, 1)`, easing out in both directions and reversible mid-flight. The content is clipped, not reflowed. Once collapsed it is hidden from pointer, focus, and screen readers.
+- **Sidebar.** Animates 238 ↔ 8 px over 150 ms with `cubic-bezier(0.22, 1, 0.36, 1)`, easing out in both directions and reversible mid-flight. The content is clipped, not reflowed. Once collapsed it is hidden from pointer, focus, and screen readers.
 - **macOS.** Traffic lights are re-centered on the 44 px title bar by the bundled native plugin, which re-applies the layout after resize and full screen.
 - **Windows / Linux.** Minimize, maximize, and close buttons are drawn by the shell. Hovering close turns it system red.
 - **Web.** The layout is the same. There are no traffic lights or caption buttons, so the controls start 12 px from the left. Dragging and double-clicking the title bar do nothing. `RaShellPlatform.current` tells you which host you are on.
@@ -396,7 +411,10 @@ cd packages/orra_desktop_shell && flutter test --platform chrome test/web_test.d
 - [x] Web support (same widgets and shell in the browser)
 - [ ] Chrome-style tab strip (per-tab history, drag to reorder, reopen closed tab)
 - [ ] Command palette (⌘K)
-- [ ] Tabs, SegmentedControl, SideCard / PropertyRow, Drawer
+- [x] Tabs, SegmentedControl, SideCard / PropertyRow, Drawer, Tag, state blocks
+- [x] Checkbox, RadioGroup, Switch, Select
+- [x] Popover, PreviewCard, Combobox, Autocomplete, Slider, NumberField, Progress, Meter, Toggle, ToggleGroup, Toolbar, Accordion, CheckboxGroup, Fieldset
+- [ ] OTP field, range slider
 - [ ] Composer, chat log, Markdown
 - [ ] Settings page layout
 - [ ] Theme editor (OKLCH-derived custom themes)

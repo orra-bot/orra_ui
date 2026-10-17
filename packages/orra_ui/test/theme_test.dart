@@ -112,4 +112,14 @@ void main() {
     );
     expect(seen.brightness, Brightness.light);
   });
+
+  test('motion: transitions run at 50 / 75 / 125 / 150 ms; delays stay put', () {
+    final RaThemeData theme = RaThemeData.light();
+    expect(theme.motion.fast, const Duration(milliseconds: 50));
+    expect(theme.motion.base, const Duration(milliseconds: 75));
+    expect(theme.motion.slow, const Duration(milliseconds: 125));
+    expect(theme.motion.layout, const Duration(milliseconds: 150));
+    expect(theme.menu.submenuHoverDelay, const Duration(milliseconds: 150));
+    expect(theme.tooltip.showDelay, const Duration(milliseconds: 600));
+  });
 }
