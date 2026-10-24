@@ -11,7 +11,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  lucide_icons_flutter: 3.1.25
+  lucide_icons_flutter: 4.0.1
   orra_desktop_shell:
     path: ../packages/orra_desktop_shell
   orra_ui:
