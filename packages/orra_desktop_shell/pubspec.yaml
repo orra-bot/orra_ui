@@ -15,9 +15,9 @@ dependencies:
   orra_ui:
     path: ../orra_ui
   path_provider: 2.1.6
-  screen_retriever: 0.2.2
-  web: 1.1.1
-  window_manager: 0.5.2
+  screen_retriever: 0.3.1
+  web: 1.1.2
+  window_manager: 0.6.0
 
 dev_dependencies:
   flutter_lints: 6.0.0
