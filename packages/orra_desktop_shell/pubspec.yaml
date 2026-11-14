@@ -16,7 +16,7 @@ dependencies:
     path: ../orra_ui
   path_provider: 2.1.6
   screen_retriever: 0.2.2
-  web: 1.1.1
+  web: 1.1.2
   window_manager: 0.5.2
 
 dev_dependencies:
